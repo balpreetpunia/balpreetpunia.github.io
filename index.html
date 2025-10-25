@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installation Pricing - Coast Appliances</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --color-white: rgba(255, 255, 255, 1);
@@ -14,90 +15,45 @@
             --color-gray-300: rgba(167, 169, 169, 1);
             --color-gray-400: rgba(119, 124, 124, 1);
             --color-slate-500: rgba(98, 108, 113, 1);
-            --color-brown-600: rgba(94, 82, 64, 1);
             --color-charcoal-700: rgba(31, 33, 33, 1);
             --color-charcoal-800: rgba(38, 40, 40, 1);
-            --color-slate-900: rgba(19, 52, 59, 1);
-            --color-teal-300: rgba(50, 184, 198, 1);
-            --color-teal-400: rgba(45, 166, 178, 1);
-            --color-teal-500: rgba(33, 128, 141, 1);
-            --color-teal-600: rgba(29, 116, 128, 1);
-            --color-teal-700: rgba(26, 104, 115, 1);
-            --color-brand: rgba(253, 181, 21, 1);
-            --color-brand-hover: rgba(230, 165, 19, 1);
-            --color-brand-light: rgba(253, 181, 21, 0.1);
-            --color-brown-600-rgb: 94, 82, 64;
-            --color-teal-500-rgb: 33, 128, 141;
-            --color-slate-900-rgb: 19, 52, 59;
-            --color-slate-500-rgb: 98, 108, 113;
-            --color-gray-400-rgb: 119, 124, 124;
-            --color-gray-300-rgb: 167, 169, 169;
-            --color-gray-200-rgb: 245, 245, 245;
-            --color-teal-300-rgb: 50, 184, 198;
-            --color-brand-rgb: 253, 181, 21;
+            --color-brand: #fdb515;
+            --color-brand-dark: #e5a314;
             --color-background: var(--color-white);
             --color-surface: var(--color-white);
-            --color-text: var(--color-slate-900);
+            --color-text: #1f2121;
             --color-text-secondary: var(--color-slate-500);
-            --color-primary: var(--color-brand);
-            --color-primary-hover: var(--color-brand-hover);
-            --color-border: rgba(var(--color-gray-400-rgb), 0.3);
-            --color-card-border: rgba(var(--color-gray-400-rgb), 0.15);
-            --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-size-sm: 12px;
-            --font-size-base: 14px;
-            --font-size-lg: 16px;
-            --font-size-xl: 18px;
-            --font-size-2xl: 20px;
-            --font-size-3xl: 24px;
-            --font-size-4xl: 30px;
-            --font-weight-medium: 500;
-            --font-weight-semibold: 550;
-            --font-weight-bold: 600;
-            --line-height-tight: 1.2;
-            --line-height-normal: 1.5;
+            --color-border: rgba(0, 0, 0, 0.1);
+            --color-card-border: rgba(0, 0, 0, 0.08);
+            --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-size-base: 15px;
+            --font-size-lg: 17px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-size-3xl: 32px;
             --space-8: 8px;
             --space-12: 12px;
             --space-16: 16px;
             --space-20: 20px;
             --space-24: 24px;
             --space-32: 32px;
+            --space-40: 40px;
             --radius-base: 8px;
             --radius-lg: 12px;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            --duration-fast: 150ms;
-            --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --color-background: var(--color-charcoal-700);
-                --color-surface: var(--color-charcoal-800);
-                --color-text: var(--color-gray-200);
-                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
-                --color-primary: var(--color-teal-300);
-                --color-primary-hover: var(--color-teal-400);
-                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
-                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
-            }
-        }
-
-        @font-face {
-            font-family: 'FKGroteskNeue';
-            src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         html {
             font-size: var(--font-size-base);
             font-family: var(--font-family-base);
-            line-height: var(--line-height-normal);
+            line-height: 1.6;
             color: var(--color-text);
             background-color: var(--color-background);
             -webkit-font-smoothing: antialiased;
@@ -105,7 +61,7 @@
 
         body {
             margin: 0;
-            padding: var(--space-24);
+            padding: var(--space-20) var(--space-16);
         }
 
         .container {
@@ -113,47 +69,90 @@
             margin: 0 auto;
         }
 
-        h1 {
-            font-size: var(--font-size-4xl);
-            font-weight: var(--font-weight-bold);
-            margin-bottom: var(--space-32);
+        header {
             text-align: center;
-            color: var(--color-text);
+            margin-bottom: var(--space-40);
         }
 
-        .category-section {
-            background-color: var(--color-surface);
+        h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--space-24);
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto var(--space-40);
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-16) var(--space-20);
+            padding-left: 48px;
+            font-size: var(--font-size-lg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--color-brand);
+            box-shadow: 0 0 0 3px rgba(253, 181, 21, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-16);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-xl);
+        }
+
+        .category-card {
+            background: var(--color-surface);
             border: 1px solid var(--color-card-border);
             border-radius: var(--radius-lg);
-            padding: var(--space-24);
-            margin-bottom: var(--space-24);
+            margin-bottom: var(--space-32);
             box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .category-card:hover {
+            box-shadow: var(--shadow-md);
         }
 
         .category-header {
-            font-size: var(--font-size-3xl);
-            font-weight: var(--font-weight-semibold);
-            margin-bottom: var(--space-20);
-            color: var(--color-primary);
-            padding-bottom: var(--space-12);
-            border-bottom: 2px solid var(--color-border);
+            background: var(--color-brand);
+            color: var(--color-white);
+            padding: var(--space-20) var(--space-24);
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+        }
+
+        .service-list {
+            padding: var(--space-16);
         }
 
         .service-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             padding: var(--space-16);
             border-bottom: 1px solid var(--color-border);
-            transition: background-color var(--duration-fast) var(--ease-standard);
-        }
-
-        .service-row:hover {
-            background-color: rgba(var(--color-brand-rgb), 0.05);
+            transition: background-color 0.2s ease;
         }
 
         .service-row:last-child {
             border-bottom: none;
+        }
+
+        .service-row:hover {
+            background-color: rgba(253, 181, 21, 0.05);
         }
 
         .service-info {
@@ -164,169 +163,111 @@
         }
 
         .service-name {
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
             color: var(--color-text);
+            font-weight: 500;
         }
 
-        .icon-group {
+        .service-icons {
             display: flex;
             gap: var(--space-8);
         }
 
         .icon-btn {
-            width: 24px;
-            height: 24px;
-            border: none;
             background: none;
+            border: none;
             cursor: pointer;
-            font-size: var(--font-size-lg);
-            transition: transform var(--duration-fast) var(--ease-standard);
-            opacity: 0.6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 16px;
+            color: var(--color-text-secondary);
+            padding: var(--space-8);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
         .icon-btn:hover {
-            transform: scale(1.2);
-            opacity: 1;
-        }
-
-        .icon-btn:focus {
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
-            border-radius: 4px;
+            color: var(--color-brand);
+            background-color: rgba(253, 181, 21, 0.1);
         }
 
         .service-price {
             font-size: var(--font-size-2xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--color-primary);
+            font-weight: 700;
+            color: var(--color-brand);
             margin-left: var(--space-16);
         }
 
-        .material-row {
-            background-color: var(--color-brand-light);
-            padding: var(--space-16);
+        .materials-section {
+            background: rgba(253, 181, 21, 0.1);
+            border: 1px solid rgba(253, 181, 21, 0.3);
             border-radius: var(--radius-base);
-            margin-top: var(--space-16);
+            padding: var(--space-16);
+            margin: var(--space-16);
         }
 
-        .material-label {
-            font-size: var(--font-size-base);
-            font-weight: var(--font-weight-bold);
-            color: var(--color-text);
+        .materials-title {
+            font-weight: 700;
+            color: var(--color-brand-dark);
             margin-bottom: var(--space-8);
-        }
-
-        .material-text {
             font-size: var(--font-size-base);
-            color: var(--color-text-secondary);
-            line-height: var(--line-height-normal);
         }
 
-        .modal {
-            display: none;
-            position: fixed;
+        .materials-text {
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(31, 33, 33, 0.95);
+            color: var(--color-white);
+            padding: var(--space-12) var(--space-16);
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 320px;
             z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.2s var(--ease-standard);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .tooltip.show {
+            opacity: 1;
         }
 
-        .modal.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .tooltip-spiff-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: var(--space-8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .modal-content {
-            background-color: var(--color-surface);
-            padding: var(--space-24);
-            border-radius: var(--radius-lg);
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            animation: slideUp 0.3s var(--ease-standard);
+        .tooltip-spiff-amount {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--color-brand);
         }
 
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--space-16);
-        }
-
-        .modal-title {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-bold);
-            color: var(--color-text);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: var(--font-size-3xl);
-            cursor: pointer;
+        .no-results {
+            text-align: center;
+            padding: var(--space-40);
             color: var(--color-text-secondary);
-            line-height: 1;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color var(--duration-fast) var(--ease-standard);
+            font-size: var(--font-size-lg);
         }
 
-        .close-btn:hover {
-            color: var(--color-text);
-        }
-
-        .close-btn:focus {
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
-            border-radius: 4px;
-        }
-
-        .modal-body {
-            font-size: var(--font-size-base);
-            color: var(--color-text);
-            line-height: 1.6;
+        .hidden {
+            display: none !important;
         }
 
         @media (max-width: 768px) {
             body {
-                padding: var(--space-16);
+                padding: var(--space-16) var(--space-12);
             }
 
             h1 {
-                font-size: var(--font-size-3xl);
-            }
-
-            .category-header {
                 font-size: var(--font-size-2xl);
             }
 
@@ -338,591 +279,549 @@
 
             .service-price {
                 margin-left: 0;
-                font-size: var(--font-size-xl);
+                align-self: flex-end;
             }
 
-            .modal-content {
-                width: 95%;
-                padding: var(--space-16);
+            .category-header {
+                font-size: var(--font-size-xl);
+                padding: var(--space-16) var(--space-20);
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Installation Pricing - Coast Appliances</h1>
+        <header>
+            <h1>Installation Pricing - Coast Appliances</h1>
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="Search services and categories..."
+                    aria-label="Search services and categories"
+                >
+            </div>
+        </header>
 
-        <div class="category-section">
-            <h2 class="category-header">Dishwasher</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and removal/haul away only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and removal/haul away only', 'Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and removal/haul away only', '$20')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$160</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation, removal and delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation, removal and delivery', 'Delivery, Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation, removal and delivery', '$60')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$240</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation, removal and delivery (panel ready)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation, removal and delivery (panel ready)', 'Delivery, Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation, removal and delivery (panel ready)', '$60')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$300</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price</div>
-            </div>
-        </div>
+        <main id="categoriesContainer"></main>
 
-        <div class="category-section">
-            <h2 class="category-header">Washer and Dryer</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only', 'Installation side by side (Gas dryer $40 extra)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only', '$20')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$150</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only (stacked)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only (stacked)', 'Installation stacked (stacking kit is extra if not provided) Gas dryer $40 extra')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only (stacked)', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and removal/haul away</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and removal/haul away', 'side by side or stacked (stacking kit is extra if not provided) Gas dryer $40 extra')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and removal/haul away', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$240</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Install, remove and delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Install, remove and delivery', 'Delivery, Installation and removal/haul away of the old unit side by side or stacked Gas dryer $40 extra')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Install, remove and delivery', '$70')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and haul away (Gas dryer only)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and haul away (Gas dryer only)', 'Installation and removal/haul away of the old unit side by side or stacked')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and haul away (Gas dryer only)', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$180</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Install, remove and delivery (Gas dryer only)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Install, remove and delivery (Gas dryer only)', 'Delivery, Installation and removal/haul away of the old unit')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Install, remove and delivery (Gas dryer only)', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Install, remove and delivery (Washer or Dryer only)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Install, remove and delivery (Washer or Dryer only)', 'Delivery, Installation and removal/haul away of the old unit Single Piece')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Install, remove and delivery (Washer or Dryer only)', '$40')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">Stainless steel hoses, Duct and clamp kit included in the price ($30 extra for the steam kit if needed)</div>
-            </div>
-        </div>
-
-        <div class="category-section">
-            <h2 class="category-header">Refrigerator (Standard and Built-in)</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Waterline Hookup</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Waterline Hookup', 'Connecting waterline with existing plumbing')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Waterline Hookup', '$10')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$80</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Waterline Hookup with new plumbing</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Waterline Hookup with new plumbing', 'Connecting waterline with new waterline plumbing')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Waterline Hookup with new plumbing', '$20')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$180</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Waterline Hookup with disconnecting the old and removal</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Waterline Hookup with disconnecting the old and removal', 'Connecting and disconnecting waterline and removal/haul away of the old unit upto 36&quot;')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Waterline Hookup with disconnecting the old and removal', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and removal/haul away (without panel)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and removal/haul away (without panel)', 'Installation and removal with haulaway Built-in upto 36&quot; without panel installation French door')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and removal/haul away (without panel)', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and removal/haul away (panel ready)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and removal/haul away (panel ready)', 'Installation and removal with haulaway Built-in upto 36&quot; with panel installation French door')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and removal/haul away (panel ready)', '$100')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$700</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only (without panel)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only (without panel)', 'Installation only Built-in upto 48&quot; without panel installation French door (DISCONNECTION INCLUDED) NO HAULAWAY')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only (without panel)', '$40')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$270</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only (with panels)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only (with panels)', 'Installation only Built-in upto 48&quot; with panel installation French door (DISCONNECTION INCLUDED) NO HAULAWAY')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only (with panels)', '$80')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$600</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only Columns with Stainless Steel Panels</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only Columns with Stainless Steel Panels', 'Installation only Columns any size with stainless steel panel installation (DISCONNECTION INCLUDED) NO HAULAWAY')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only Columns with Stainless Steel Panels', '$150')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$900</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation only Columns with Wooden Panels</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation only Columns with Wooden Panels', 'Installation only Columns any size with wooden panel installation (DISCONNECTION INCLUDED) NO HAULAWAY')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation only Columns with Wooden Panels', '$150')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$1100</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price</div>
-            </div>
-        </div>
-
-        <div class="category-section">
-            <h2 class="category-header">Rangehood</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Under the Cabinet 30" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Under the Cabinet 30&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $150)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Under the Cabinet 30&quot; Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Under the Cabinet 36" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Under the Cabinet 36&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Under the Cabinet 36&quot; Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Chimney Hood 30"-36" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Chimney Hood 30&quot;-36&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $230)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Chimney Hood 30&quot;-36&quot; Installation, Removal and Delivery', '$40')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$300</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Insert Hood 30"-36" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Insert Hood 30&quot;-36&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $150)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Insert Hood 30&quot;-36&quot; Installation, Removal and Delivery', '$40')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Chimney Hood 37" and UP Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Chimney Hood 37&quot; and UP Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $280)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Chimney Hood 37&quot; and UP Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Insert Hood with outside Motor Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Insert Hood with outside Motor Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $500)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Insert Hood with outside Motor Installation, Removal and Delivery', '$80')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$550</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Downdraft any size</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Downdraft any size', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $400)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Downdraft any size', '$70')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$450</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Insert Hood 37" and UP Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Insert Hood 37&quot; and UP Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $280)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Insert Hood 37&quot; and UP Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">OTR Microwave Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'OTR Microwave Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $220)')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'OTR Microwave Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$280</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price</div>
-            </div>
-        </div>
-
-        <div class="category-section">
-            <h2 class="category-header">Wall Oven and Microwave</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Walloven Combo Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Walloven Combo Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Walloven Combo Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$300</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Single Walloven Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Single Walloven Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Single Walloven Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Single Microwave Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Single Microwave Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Single Microwave Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Walloven and Microwave (single) Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Walloven and Microwave (single) Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Walloven and Microwave (single) Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Microwave Drawer Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Microwave Drawer Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Microwave Drawer Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Microwave with Trim Kit Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Microwave with Trim Kit Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Microwave with Trim Kit Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Double Walloven Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Double Walloven Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Double Walloven Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$300</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price</div>
-            </div>
-        </div>
-
-        <div class="category-section">
-            <h2 class="category-header">Electric & Gas Range and Cooktop</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Electric/Induction Range Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Electric/Induction Range Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $100) *IF NO REMOVAL/HAULAWAY $50*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Electric/Induction Range Installation, Removal and Delivery', '$10')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$150</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Electric/Induction Cooktop 24" and UP Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Electric/Induction Cooktop 24&quot; and UP Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $140*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Electric/Induction Cooktop 24&quot; and UP Installation, Removal and Delivery', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Gas Rangetop upto 36" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Gas Rangetop upto 36&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Gas Rangetop upto 36&quot; Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Gas Rangetop 37" and UP Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Gas Rangetop 37&quot; and UP Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $350) *IF NO REMOVAL/HAULAWAY $250*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Gas Rangetop 37&quot; and UP Installation, Removal and Delivery', '$70')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$450</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Induction Rangetop 30" and UP Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Induction Rangetop 30&quot; and UP Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Induction Rangetop 30&quot; and UP Installation, Removal and Delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Gas Range 30" Installation, Removal and Delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Gas Range 30&quot; Installation, Removal and Delivery', 'Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Gas Range 30&quot; Installation, Removal and Delivery', '$40')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$300</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Gas Range 36" and UP (Built-in) Installation and Removal only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Gas Range 36&quot; and UP (Built-in) Installation and Removal only', 'Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Gas Range 36&quot; and UP (Built-in) Installation and Removal only', '$30')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$250</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">*AGA* Gas/Electric/Induction Installation and Removal only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', '*AGA* Gas/Electric/Induction Installation and Removal only', 'Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', '*AGA* Gas/Electric/Induction Installation and Removal only', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$350</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Downdraft Range/Cooktop Gas/Induction Installation and Removal only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Downdraft Range/Cooktop Gas/Induction Installation and Removal only', 'Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Downdraft Range/Cooktop Gas/Induction Installation and Removal only', '$70')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$450</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price (Special price for *AGA Ranges*) (Gas connector is included in the price)</div>
-            </div>
-        </div>
-
-        <div class="category-section">
-            <h2 class="category-header">Beverage Centre</h2>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation and removal/haul away only</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation and removal/haul away only', 'Installation and removal/haul away of the old unit')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation and removal/haul away only', '$20')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$140</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation, removal and delivery</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation, removal and delivery', 'Delivery, Installation and removal/haul away of the old unit')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation, removal and delivery', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$200</span>
-            </div>
-            <div class="service-row">
-                <div class="service-info">
-                    <span class="service-name">Installation, removal and delivery (panel ready)</span>
-                    <div class="icon-group">
-                        <button class="icon-btn" aria-label="Information" onclick="showModal('info', 'Installation, removal and delivery (panel ready)', 'Delivery, Installation and removal/haul away of the old unit')">ℹ️</button>
-                        <button class="icon-btn" aria-label="Spiff amount" onclick="showModal('spiff', 'Installation, removal and delivery (panel ready)', '$50')">💵</button>
-                    </div>
-                </div>
-                <span class="service-price">$280</span>
-            </div>
-            <div class="material-row">
-                <div class="material-label">Materials Included:</div>
-                <div class="material-text">All the standard material required is included in the price</div>
-            </div>
+        <div id="noResults" class="no-results hidden">
+            <i class="fa-solid fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+            <p>No services found matching your search.</p>
         </div>
     </div>
 
-    <div id="modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title" class="modal-title"></h3>
-                <button class="close-btn" onclick="closeModal()" aria-label="Close modal">&times;</button>
-            </div>
-            <div id="modal-body" class="modal-body"></div>
-        </div>
-    </div>
+    <div id="tooltip" class="tooltip" role="tooltip"></div>
 
     <script>
-        function showModal(type, serviceName, content) {
-            const modal = document.getElementById('modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-            
+        const pricingData = [
+            {
+                category: "Dishwasher",
+                services: [
+                    {
+                        name: "Installation and removal/haul away only",
+                        price: 160,
+                        notes: "Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)",
+                        spiff: 20
+                    },
+                    {
+                        name: "Installation, removal and delivery",
+                        price: 240,
+                        notes: "Delivery, Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)",
+                        spiff: 60
+                    },
+                    {
+                        name: "Installation, removal and delivery (panel ready)",
+                        price: 300,
+                        notes: "Delivery, Installation and removal/haul away of the old unit ($30 extra for electric plug if needed)",
+                        spiff: 60
+                    }
+                ],
+                materials: "All the standard material required is included in the price"
+            },
+            {
+                category: "Washer and Dryer",
+                services: [
+                    {
+                        name: "Installation only",
+                        price: 150,
+                        notes: "Installation side by side (Gas dryer $40 extra)",
+                        spiff: 20
+                    },
+                    {
+                        name: "Installation only (stacked)",
+                        price: 200,
+                        notes: "Installation stacked (stacking kit is extra if not provided) Gas dryer $40 extra",
+                        spiff: 30
+                    },
+                    {
+                        name: "Installation and removal/haul away",
+                        price: 240,
+                        notes: "side by side or stacked (stacking kit is extra if not provided) Gas dryer $40 extra",
+                        spiff: 50
+                    },
+                    {
+                        name: "Install, remove and delivery",
+                        price: 350,
+                        notes: "Delivery, Installation and removal/haul away of the old unit side by side or stacked Gas dryer $40 extra",
+                        spiff: 70
+                    },
+                    {
+                        name: "Installation and haul away (Gas dryer only)",
+                        price: 180,
+                        notes: "Installation and removal/haul away of the old unit side by side or stacked",
+                        spiff: 30
+                    },
+                    {
+                        name: "Install, remove and delivery (Gas dryer only)",
+                        price: 250,
+                        notes: "Delivery, Installation and removal/haul away of the old unit",
+                        spiff: 50
+                    },
+                    {
+                        name: "Install, remove and delivery (Washer or Dryer only)",
+                        price: 200,
+                        notes: "Delivery, Installation and removal/haul away of the old unit Single Piece",
+                        spiff: 40
+                    }
+                ],
+                materials: "Stainless steel hoses, Duct and clamp kit included in the price ($30 extra for the steam kit if needed)"
+            },
+            {
+                category: "Refrigerator (Standard and Built-in)",
+                services: [
+                    {
+                        name: "Waterline Hookup",
+                        price: 80,
+                        notes: "Connecting waterline with existing plumbing",
+                        spiff: 10
+                    },
+                    {
+                        name: "Waterline Hookup with new plumbing",
+                        price: 180,
+                        notes: "Connecting waterline with new waterline plumbing",
+                        spiff: 20
+                    },
+                    {
+                        name: "Waterline Hookup with disconnecting the old and removal",
+                        price: 200,
+                        notes: 'Connecting and disconnecting waterline and removal/haul away of the old unit upto 36"',
+                        spiff: 30
+                    },
+                    {
+                        name: "Installation and removal/haul away (without panel)",
+                        price: 350,
+                        notes: 'Installation and removal with haulaway Built-in upto 36" without panel installation French door',
+                        spiff: 50
+                    },
+                    {
+                        name: "Installation and removal/haul away (panel ready)",
+                        price: 700,
+                        notes: 'Installation and removal with haulaway Built-in upto 36" with panel installation French door',
+                        spiff: 100
+                    },
+                    {
+                        name: "Installation only (without panel)",
+                        price: 270,
+                        notes: 'Installation only Built-in upto 48" without panel installation French door (DISCONNECTION INCLUDED) NO HAULAWAY',
+                        spiff: 40
+                    },
+                    {
+                        name: "Installation only (with panels)",
+                        price: 600,
+                        notes: 'Installation only Built-in upto 48" with panel installation French door (DISCONNECTION INCLUDED) NO HAULAWAY',
+                        spiff: 80
+                    },
+                    {
+                        name: "Installation only Columns with Stainless Steel Panels",
+                        price: 900,
+                        notes: "Installation only Columns any size with stainless steel panel installation (DISCONNECTION INCLUDED) NO HAULAWAY",
+                        spiff: 150
+                    },
+                    {
+                        name: "Installation only Columns with Wooden Panels",
+                        price: 1100,
+                        notes: "Installation only Columns any size with wooden panel installation (DISCONNECTION INCLUDED) NO HAULAWAY",
+                        spiff: 150
+                    }
+                ],
+                materials: "All the standard material required is included in the price"
+            },
+            {
+                category: "Rangehood",
+                services: [
+                    {
+                        name: 'Under the Cabinet 30" Installation, Removal and Delivery',
+                        price: 200,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $150)",
+                        spiff: 30
+                    },
+                    {
+                        name: 'Under the Cabinet 36" Installation, Removal and Delivery',
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200)",
+                        spiff: 30
+                    },
+                    {
+                        name: 'Chimney Hood 30"-36" Installation, Removal and Delivery',
+                        price: 300,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $230)",
+                        spiff: 40
+                    },
+                    {
+                        name: 'Insert Hood 30"-36" Installation, Removal and Delivery',
+                        price: 200,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $150)",
+                        spiff: 40
+                    },
+                    {
+                        name: 'Chimney Hood 37" and UP Installation, Removal and Delivery',
+                        price: 350,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $280)",
+                        spiff: 50
+                    },
+                    {
+                        name: "Insert Hood with outside Motor Installation, Removal and Delivery",
+                        price: 550,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $500)",
+                        spiff: 80
+                    },
+                    {
+                        name: "Downdraft any size",
+                        price: 450,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $400)",
+                        spiff: 70
+                    },
+                    {
+                        name: 'Insert Hood 37" and UP Installation, Removal and Delivery',
+                        price: 350,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $280)",
+                        spiff: 50
+                    },
+                    {
+                        name: "OTR Microwave Installation, Removal and Delivery",
+                        price: 280,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $220)",
+                        spiff: 50
+                    }
+                ],
+                materials: "All the standard material required is included in the price"
+            },
+            {
+                category: "Wall Oven and Microwave",
+                services: [
+                    {
+                        name: "Walloven Combo Installation, Removal and Delivery",
+                        price: 300,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*",
+                        spiff: 30
+                    },
+                    {
+                        name: "Single Walloven Installation, Removal and Delivery",
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*",
+                        spiff: 30
+                    },
+                    {
+                        name: "Single Microwave Installation, Removal and Delivery",
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*",
+                        spiff: 30
+                    },
+                    {
+                        name: "Walloven and Microwave (single) Installation, Removal and Delivery",
+                        price: 350,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*",
+                        spiff: 50
+                    },
+                    {
+                        name: "Microwave Drawer Installation, Removal and Delivery",
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*",
+                        spiff: 30
+                    },
+                    {
+                        name: "Microwave with Trim Kit Installation, Removal and Delivery",
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $150*",
+                        spiff: 30
+                    },
+                    {
+                        name: "Double Walloven Installation, Removal and Delivery",
+                        price: 300,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*",
+                        spiff: 50
+                    }
+                ],
+                materials: "All the standard material required is included in the price"
+            },
+            {
+                category: "Electric & Gas Range and Cooktop",
+                services: [
+                    {
+                        name: "Electric/Induction Range Installation, Removal and Delivery",
+                        price: 150,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $100) *IF NO REMOVAL/HAULAWAY $50*",
+                        spiff: 10
+                    },
+                    {
+                        name: 'Electric/Induction Cooktop 24" and UP Installation, Removal and Delivery',
+                        price: 250,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $200) *IF NO REMOVAL/HAULAWAY $140*",
+                        spiff: 30
+                    },
+                    {
+                        name: 'Gas Rangetop upto 36" Installation, Removal and Delivery',
+                        price: 350,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*",
+                        spiff: 50
+                    },
+                    {
+                        name: 'Gas Rangetop 37" and UP Installation, Removal and Delivery',
+                        price: 450,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $350) *IF NO REMOVAL/HAULAWAY $250*",
+                        spiff: 70
+                    },
+                    {
+                        name: 'Induction Rangetop 30" and UP Installation, Removal and Delivery',
+                        price: 350,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $300) *IF NO REMOVAL/HAULAWAY $250*",
+                        spiff: 50
+                    },
+                    {
+                        name: 'Gas Range 30" Installation, Removal and Delivery',
+                        price: 300,
+                        notes: "Installation, Removal/Haulaway and delivery (IF CUSTOMER PICKUP $250) *IF NO REMOVAL/HAULAWAY $170*",
+                        spiff: 40
+                    },
+                    {
+                        name: 'Gas Range 36" and UP (Built-in) Installation and Removal only',
+                        price: 250,
+                        notes: "Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**",
+                        spiff: 30
+                    },
+                    {
+                        name: "*AGA* Gas/Electric/Induction Installation and Removal only",
+                        price: 350,
+                        notes: "Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**",
+                        spiff: 50
+                    },
+                    {
+                        name: "Downdraft Range/Cooktop Gas/Induction Installation and Removal only",
+                        price: 450,
+                        notes: "Installation, Removal only **NO DELIVERY // NO HAULAWAY (ONLY DISCONNECTION)**",
+                        spiff: 70
+                    }
+                ],
+                materials: "All the standard material required is included in the price (Special price for *AGA Ranges*) (Gas connector is included in the price)"
+            },
+            {
+                category: "Beverage Centre",
+                services: [
+                    {
+                        name: "Installation and removal/haul away only",
+                        price: 140,
+                        notes: "Installation and removal/haul away of the old unit",
+                        spiff: 20
+                    },
+                    {
+                        name: "Installation, removal and delivery",
+                        price: 200,
+                        notes: "Delivery, Installation and removal/haul away of the old unit",
+                        spiff: 50
+                    },
+                    {
+                        name: "Installation, removal and delivery (panel ready)",
+                        price: 280,
+                        notes: "Delivery, Installation and removal/haul away of the old unit",
+                        spiff: 50
+                    }
+                ],
+                materials: "All the standard material required is included in the price"
+            }
+        ];
+
+        let allCategories = [];
+        const tooltip = document.getElementById('tooltip');
+        let currentTooltipElement = null;
+
+        function renderCategories(data = pricingData) {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('noResults').classList.add('hidden');
+
+            data.forEach((category, categoryIndex) => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.setAttribute('data-category-index', categoryIndex);
+
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = category.category;
+
+                const serviceList = document.createElement('div');
+                serviceList.className = 'service-list';
+
+                category.services.forEach((service, serviceIndex) => {
+                    const row = document.createElement('div');
+                    row.className = 'service-row';
+                    row.setAttribute('data-service-index', serviceIndex);
+
+                    const serviceInfo = document.createElement('div');
+                    serviceInfo.className = 'service-info';
+
+                    const serviceName = document.createElement('div');
+                    serviceName.className = 'service-name';
+                    serviceName.textContent = service.name;
+
+                    const icons = document.createElement('div');
+                    icons.className = 'service-icons';
+
+                    const infoBtn = document.createElement('button');
+                    infoBtn.className = 'icon-btn';
+                    infoBtn.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+                    infoBtn.setAttribute('aria-label', 'View service information');
+                    infoBtn.setAttribute('data-tooltip', service.notes);
+                    infoBtn.setAttribute('data-type', 'info');
+
+                    const dollarBtn = document.createElement('button');
+                    dollarBtn.className = 'icon-btn';
+                    dollarBtn.innerHTML = '<i class="fa-solid fa-dollar-sign"></i>';
+                    dollarBtn.setAttribute('aria-label', 'View spiff amount');
+                    dollarBtn.setAttribute('data-tooltip', service.spiff);
+                    dollarBtn.setAttribute('data-type', 'spiff');
+
+                    icons.appendChild(infoBtn);
+                    icons.appendChild(dollarBtn);
+
+                    serviceInfo.appendChild(serviceName);
+                    serviceInfo.appendChild(icons);
+
+                    const price = document.createElement('div');
+                    price.className = 'service-price';
+                    price.textContent = `$${service.price}`;
+
+                    row.appendChild(serviceInfo);
+                    row.appendChild(price);
+
+                    serviceList.appendChild(row);
+                });
+
+                const materialsSection = document.createElement('div');
+                materialsSection.className = 'materials-section';
+
+                const materialsTitle = document.createElement('div');
+                materialsTitle.className = 'materials-title';
+                materialsTitle.textContent = 'Materials Included';
+
+                const materialsText = document.createElement('div');
+                materialsText.className = 'materials-text';
+                materialsText.textContent = category.materials;
+
+                materialsSection.appendChild(materialsTitle);
+                materialsSection.appendChild(materialsText);
+
+                card.appendChild(header);
+                card.appendChild(serviceList);
+                card.appendChild(materialsSection);
+
+                container.appendChild(card);
+            });
+
+            allCategories = Array.from(document.querySelectorAll('.category-card'));
+            attachTooltipListeners();
+        }
+
+        function attachTooltipListeners() {
+            const iconButtons = document.querySelectorAll('.icon-btn');
+
+            iconButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', showTooltip);
+                btn.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        function showTooltip(e) {
+            const button = e.currentTarget;
+            const type = button.getAttribute('data-type');
+            const content = button.getAttribute('data-tooltip');
+
             if (type === 'info') {
-                modalTitle.textContent = serviceName;
-                modalBody.textContent = content;
+                tooltip.innerHTML = content;
             } else if (type === 'spiff') {
-                modalTitle.textContent = 'Spiff Amount';
-                modalBody.innerHTML = `<strong>${serviceName}</strong><br><br>Spiff: ${content}`;
+                tooltip.innerHTML = `
+                    <div class="tooltip-spiff-title">Spiff Amount</div>
+                    <div class="tooltip-spiff-amount">$${content}</div>
+                `;
             }
-            
-            modal.classList.add('active');
-            modal.focus();
+
+            const rect = button.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+
+            let top = rect.top - tooltipRect.height - 8;
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+
+            if (top < 0) {
+                top = rect.bottom + 8;
+            }
+
+            if (left < 8) {
+                left = 8;
+            } else if (left + tooltipRect.width > window.innerWidth - 8) {
+                left = window.innerWidth - tooltipRect.width - 8;
+            }
+
+            tooltip.style.top = `${top + window.scrollY}px`;
+            tooltip.style.left = `${left}px`;
+            tooltip.classList.add('show');
+
+            currentTooltipElement = button;
         }
 
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.classList.remove('active');
+        function hideTooltip() {
+            tooltip.classList.remove('show');
+            currentTooltipElement = null;
         }
 
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
+        function filterServices() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
+            if (!searchTerm) {
+                renderCategories(pricingData);
+                return;
             }
-        });
+
+            const filteredData = pricingData.map(category => {
+                const categoryMatches = category.category.toLowerCase().includes(searchTerm);
+
+                const filteredServices = category.services.filter(service => 
+                    service.name.toLowerCase().includes(searchTerm)
+                );
+
+                if (categoryMatches || filteredServices.length > 0) {
+                    return {
+                        ...category,
+                        services: categoryMatches ? category.services : filteredServices
+                    };
+                }
+
+                return null;
+            }).filter(category => category !== null);
+
+            renderCategories(filteredData);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterServices);
+
+        renderCategories();
     </script>
 </body>
 </html>

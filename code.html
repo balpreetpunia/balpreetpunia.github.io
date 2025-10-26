@@ -2,691 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <!-- iPhone zoom fix: prevent auto-zoom when focusing inputs -->
+  <!-- iPhone zoom fix -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Simple Barcode POS — Quagga</title>
+  <title>Simple Barcode POS — Quagga Autofocus</title>
 
-  <!-- Quagga CDN (will be cached after first load) -->
+  <!-- Quagga CDN -->
   <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
 
   <style>
     :root{
-      --bg: #f7f8fb;
-      --card: #ffffff;
-      --muted: #6b7280;
-      --accent: #2563eb;
-      --accent-2: #10b981;
-      --danger: #ef4444;
-      --radius: 12px;
-      --gap: 12px;
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#2563eb;
+      --accent-2:#10b981;
+      --danger:#ef4444;
+      --radius:12px;
+      --gap:12px;
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
       background:var(--bg);
       color:#0f172a;
       -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
       padding:16px;
       display:flex;
       justify-content:center;
     }
-
-    .container{
-      width:100%;
-      max-width:960px;
-    }
-
-    header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:var(--gap);
-      margin-bottom:12px;
-    }
-
-    h1{font-size:18px; margin:0}
-    p.lead{margin:0;color:var(--muted); font-size:13px}
-
-    /* scanner + controls card */
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:12px;
-      box-shadow: 0 6px 18px rgba(12, 18, 36, 0.06);
-      margin-bottom:12px;
-    }
-
-    /* scanner area */
-    #scanner-area{
-      width:100%;
-      border-radius:8px;
-      overflow:hidden;
-      background:linear-gradient(180deg,#eef2ff,#ffffff);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      /* important: keep compact when stopped to avoid large blank gap */
-      min-height:180px;
-      height:40vw;       /* mobile-first: scanner approx square-ish */
-      max-height:360px;  /* avoid giant on desktop */
-    }
-
-    /* video overlay element created by Quagga is appended inside this div */
-    #interactive.viewport {
-      width:100%;
-      height:100%;
-      position:relative;
-    }
-
-    /* overlay instructions */
-    .scanner-overlay {
-      position:absolute;
-      top:8px;
-      left:8px;
-      background: rgba(0,0,0,0.45);
-      color:#fff;
-      padding:6px 8px;
-      border-radius:999px;
-      font-size:13px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .controls{
-      margin-top:10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-    }
-
-    .btn{
-      border:0;
-      padding:10px 12px;
-      border-radius:10px;
-      font-weight:600;
-      cursor:pointer;
-      font-size:14px;
-      background:var(--accent);
-      color:#fff;
-      box-shadow: 0 3px 8px rgba(37,99,235,0.12);
-    }
-    .btn.secondary{
-      background:linear-gradient(180deg,#fff,#f8fafc);
-      color:#111827;
-      border:1px solid #e6e9f2;
-      box-shadow:none;
-    }
+    .container{width:100%;max-width:960px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);margin-bottom:12px}
+    h1{font-size:18px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 6px 18px rgba(12,18,36,0.06);margin-bottom:12px}
+    #scanner-area{width:100%;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#eef2ff,#ffffff);display:flex;align-items:center;justify-content:center;position:relative;min-height:180px;height:40vw;max-height:360px}
+    #interactive.viewport{width:100%;height:100%;position:relative}
+    .scanner-overlay{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.45);color:#fff;padding:6px 8px;border-radius:999px;font-size:13px;display:flex;gap:8px;align-items:center}
+    .controls{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .btn{border:0;padding:10px 12px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;background:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(37,99,235,0.12)}
+    .btn.secondary{background:linear-gradient(180deg,#fff,#f8fafc);color:#111827;border:1px solid #e6e9f2;box-shadow:none}
     .btn.danger{background:var(--danger)}
     .btn.green{background:var(--accent-2)}
     .btn.small{padding:8px 10px;font-size:13px;border-radius:8px}
-
-    /* table */
-    .table-wrap{
-      margin-top:12px;
-      overflow:auto;
-      max-height:260px;
-      border-radius:8px;
-      background:transparent;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
-    }
-    th,td{
-      padding:8px 10px;
-      text-align:left;
-      border-bottom:1px dashed #e6e9f2;
-    }
-    th{color:var(--muted); font-weight:700; font-size:12px}
-
-    /* live total */
-    .live-total{
-      margin-top:8px;
-      font-weight:700;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
-
-    /* manual entry row */
-    .manual-row{
-      display:flex;
-      gap:8px;
-      margin-top:8px;
-      flex-wrap:wrap;
-    }
-
-    input[type="text"], input[type="number"]{
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid #e6e9f2;
-      font-size:16px; /* >=16px prevents iOS zoom */
-      min-width:0;
-      outline:none;
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-
-    /* modal (simple) */
-    .modal-backdrop{
-      position:fixed;
-      inset:0;
-      background:rgba(2,6,23,0.45);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    }
-    .modal{
-      width:92%;
-      max-width:420px;
-      background:var(--card);
-      border-radius:12px;
-      padding:16px;
-      box-shadow:0 12px 30px rgba(2,6,23,0.3);
-    }
+    .table-wrap{margin-top:12px;overflow:auto;max-height:260px;border-radius:8px;background:transparent}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:8px 10px;text-align:left;border-bottom:1px dashed #e6e9f2}
+    th{color:var(--muted);font-weight:700;font-size:12px}
+    .live-total{margin-top:8px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .manual-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    input[type="text"],input[type="number"]{padding:10px 12px;border-radius:10px;border:1px solid #e6e9f2;font-size:16px;min-width:0;outline:none}
+    input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .modal{width:92%;max-width:420px;background:var(--card);border-radius:12px;padding:16px;box-shadow:0 12px 30px rgba(2,6,23,0.3)}
     .modal h3{margin:0 0 8px 0}
-    .modal .row{display:flex; gap:8px; align-items:center}
-
-    footer{
-      margin-top:12px;
-      text-align:center;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    /* small screens tweak */
-    @media(min-width:720px){
-      #scanner-area{ height:320px; }
-      .manual-row input[type="text"]{flex:1}
-    }
-
+    footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+    @media(min-width:720px){#scanner-area{height:320px}.manual-row input[type="text"]{flex:1}}
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1>QuickScan POS</h1>
-        <p class="lead">Scan EAN-13 / EAN-8 barcodes, add prices, save orders — all offline.</p>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:12px;color:var(--muted)">Offline-capable • localStorage</div>
-      </div>
-    </header>
+<div class="container">
+  <header>
+    <div>
+      <h1>QuickScan POS</h1>
+      <p class="lead">Scan EAN-13 / EAN-8 barcodes, add prices, save orders — all offline.</p>
+    </div>
+  </header>
 
-    <div class="card">
-      <div id="scanner-area">
-        <div id="interactive" class="viewport"></div>
-        <div class="scanner-overlay" id="scanner-status">🔴 stopped</div>
-      </div>
+  <div class="card">
+    <div id="scanner-area">
+      <div id="interactive" class="viewport"></div>
+      <div class="scanner-overlay" id="scanner-status">🔴 stopped</div>
+    </div>
 
-      <div class="controls">
-        <button id="toggle-scan" class="btn">Start Scanning</button>
-        <button id="start-order" class="btn secondary">Start New Order</button>
-        <button id="export-csv" class="btn small secondary">Export CSV</button>
-
-        <div style="flex:1"></div>
-
-        <div style="display:flex; gap:8px; align-items:center">
-          <div style="font-size:13px;color:var(--muted)">Live order total:</div>
-          <div id="live-total" style="font-weight:800">₹0.00</div>
-        </div>
-      </div>
-
-      <div class="manual-row">
-        <input id="manual-code" type="text" placeholder="Manual barcode (type EAN)"/>
-        <input id="manual-price" type="number" placeholder="Price (optional)" step="0.01" min="0"/>
-        <button id="add-manual" class="btn secondary">Add Manually</button>
-      </div>
-
-      <div class="table-wrap">
-        <table id="items-table" aria-live="polite">
-          <thead>
-            <tr>
-              <th>Barcode</th>
-              <th>Price</th>
-              <th>Timestamp</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="items-body">
-            <!-- filled by JS -->
-          </tbody>
-        </table>
+    <div class="controls">
+      <button id="toggle-scan" class="btn">Start Scanning</button>
+      <button id="start-order" class="btn secondary">Start New Order</button>
+      <button id="export-csv" class="btn small secondary">Export CSV</button>
+      <div style="flex:1"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="font-size:13px;color:var(--muted)">Live order total:</div>
+        <div id="live-total" style="font-weight:800">₹0.00</div>
       </div>
     </div>
 
-    <footer>
-      Tip: grant camera access. If camera fails, use manual entry.
-    </footer>
+    <div class="manual-row">
+      <input id="manual-code" type="text" placeholder="Manual barcode (type EAN)"/>
+      <input id="manual-price" type="number" placeholder="Price (optional)" step="0.01" min="0"/>
+      <button id="add-manual" class="btn secondary">Add Manually</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="items-table">
+        <thead><tr><th>Barcode</th><th>Price</th><th>Timestamp</th><th></th></tr></thead>
+        <tbody id="items-body"></tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Price modal (hidden until needed) -->
-  <div id="price-modal" style="display:none;"></div>
+  <footer>Tip: grant camera access. If focus is poor, move barcode closer or ensure light.</footer>
+</div>
+
+<div id="price-modal" style="display:none;"></div>
 
 <script>
-/* ------------------------
-   Storage keys & helpers
-   ------------------------ */
-const STORAGE = {
-  priceMap: 'qs_price_map',           // { barcode: price }
-  currentOrder: 'qs_current_order',   // {items: [...]}
-  orders: 'qs_orders'                 // [ {id, items, total, createdAt} ]
-};
+const STORAGE={priceMap:'qs_price_map',currentOrder:'qs_current_order',orders:'qs_orders'};
+const saveJSON=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const loadJSON=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
+let priceMap=loadJSON(STORAGE.priceMap,{}),currentOrder=loadJSON(STORAGE.currentOrder,{items:[]}),orders=loadJSON(STORAGE.orders,[]);
+const toggleBtn=document.getElementById('toggle-scan'),scannerStatus=document.getElementById('scanner-status'),interactive=document.getElementById('interactive'),itemsBody=document.getElementById('items-body'),liveTotalEl=document.getElementById('live-total'),startOrderBtn=document.getElementById('start-order'),exportBtn=document.getElementById('export-csv'),manualCode=document.getElementById('manual-code'),manualPrice=document.getElementById('manual-price'),addManualBtn=document.getElementById('add-manual'),priceModalRoot=document.getElementById('price-modal');
+let scanning=false,lastDetected={code:null,time:0};
+const nowLocal=()=>new Date().toLocaleString();
+const formatMoney=n=>'₹'+(Number(n)||0).toFixed(2);
+const computeOrderTotal=o=>(o.items||[]).reduce((s,it)=>s+(+it.price||0),0);
+function escapeHtml(s){return s?String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])):''}
+function renderItems(){itemsBody.innerHTML='';(currentOrder.items||[]).forEach((it,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(it.code)}</td><td>${formatMoney(it.price)}</td><td>${escapeHtml(it.timestamp)}</td><td style="text-align:right"><button class="btn small secondary" data-idx="${i}">Delete</button></td>`;itemsBody.appendChild(tr)});itemsBody.querySelectorAll('button[data-idx]').forEach(b=>b.onclick=()=>{currentOrder.items.splice(+b.dataset.idx,1);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal()})}
+function updateLiveTotal(){liveTotalEl.textContent=formatMoney(computeOrderTotal(currentOrder));}
+function showPriceModal(code,suggested){return new Promise(res=>{priceModalRoot.innerHTML=`<div class="modal-backdrop"><div class="modal"><h3>Add price</h3><div style="color:#6b7280;font-size:13px;margin-bottom:8px">Barcode: <strong>${escapeHtml(code)}</strong></div><div style="display:flex;gap:8px;margin-bottom:10px;"><input id="modal-price" type="number" step="0.01" min="0" placeholder="Price" style="flex:1" value="${suggested??''}"/><button id="save-price" class="btn">Save</button></div><div style="display:flex;gap:8px;justify-content:flex-end;"><button id="cancel-price" class="btn secondary">Cancel</button></div></div></div>`;priceModalRoot.style.display='block';const m=document.getElementById('modal-price');m.focus();document.getElementById('save-price').onclick=()=>{const v=m.value.trim();if(v===''||+v<0){alert('Enter valid price');m.focus();return}close();res({action:'save',price:+v})};document.getElementById('cancel-price').onclick=()=>{close();res({action:'cancel'})};function close(){priceModalRoot.style.display='none';priceModalRoot.innerHTML='';}})}
+async function handleScannedCode(code){const now=Date.now();if(lastDetected.code===code&&now-lastDetected.time<1200)return;lastDetected={code,time:now};stopScanner();const suggested=priceMap[code];const r=await showPriceModal(code,suggested??'');if(r.action==='save'){const item={code,price:r.price,timestamp:nowLocal()};priceMap[code]=r.price;currentOrder.items.push(item);saveJSON(STORAGE.priceMap,priceMap);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();}startScanner();}
+addManualBtn.onclick=async()=>{const c=manualCode.value.trim();if(!c)return alert('Enter barcode');const p=manualPrice.value.trim();const s=p!==''?+p:priceMap[c];const r=await showPriceModal(c,s??'');if(r.action==='save'){const it={code:c,price:r.price,timestamp:nowLocal()};priceMap[c]=r.price;currentOrder.items.push(it);saveJSON(STORAGE.priceMap,priceMap);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();manualCode.value='';manualPrice.value='';}};
+startOrderBtn.onclick=()=>{const t=computeOrderTotal(currentOrder);alert('Order total: '+formatMoney(t));orders.push({id:'order-'+Date.now(),items:currentOrder.items.slice(),total:t,createdAt:new Date().toISOString()});saveJSON(STORAGE.orders,orders);currentOrder={items:[]};saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();};
+exportBtn.onclick=()=>{const all=orders.slice();if(currentOrder.items.length)all.push({id:'current-'+Date.now(),items:currentOrder.items.slice(),total:computeOrderTotal(currentOrder),createdAt:new Date().toISOString()});const rows=[['orderId','orderCreatedAt','barcode','price','itemTimestamp']];all.forEach(o=>o.items.forEach(it=>rows.push([o.id,o.createdAt,it.code,(+it.price).toFixed(2),it.timestamp])));const csv=rows.map(r=>r.map(c=>typeof c==='string'&&(c.includes(',')||c.includes('"'))?`"${c.replace(/"/g,'""')}"`:c).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='orders_'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';a.click();URL.revokeObjectURL(url);};
 
-function saveJSON(key, value){
-  localStorage.setItem(key, JSON.stringify(value));
-}
-function loadJSON(key, fallback){
-  try {
-    const v = localStorage.getItem(key);
-    return v ? JSON.parse(v) : fallback;
-  } catch(e){ return fallback; }
-}
-
-/* Initialize storage if not present */
-let priceMap = loadJSON(STORAGE.priceMap, {});
-let currentOrder = loadJSON(STORAGE.currentOrder, { items: [] });
-let orders = loadJSON(STORAGE.orders, []);
-
-/* ------------------------
-   UI refs
-   ------------------------ */
-const toggleBtn = document.getElementById('toggle-scan');
-const scannerStatus = document.getElementById('scanner-status');
-const interactive = document.getElementById('interactive');
-const itemsBody = document.getElementById('items-body');
-const liveTotalEl = document.getElementById('live-total');
-const startOrderBtn = document.getElementById('start-order');
-const exportBtn = document.getElementById('export-csv');
-
-const manualCode = document.getElementById('manual-code');
-const manualPrice = document.getElementById('manual-price');
-const addManualBtn = document.getElementById('add-manual');
-
-const priceModalRoot = document.getElementById('price-modal');
-
-let scanning = false;
-let lastDetected = { code: null, time: 0 };
-
-/* ------------------------
-   Utilities
-   ------------------------ */
-function nowLocal(){
-  return new Date().toLocaleString();
-}
-function formatMoney(n){
-  const num = Number(n) || 0;
-  return '₹' + num.toFixed(2);
-}
-function computeOrderTotal(order){
-  return (order.items || []).reduce((s,it)=> s + (Number(it.price)||0), 0);
-}
-
-/* ------------------------
-   Render functions
-   ------------------------ */
-function renderItems(){
-  itemsBody.innerHTML = '';
-  (currentOrder.items || []).forEach((it, idx)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(it.code)}</td>
-      <td>${formatMoney(it.price)}</td>
-      <td style="white-space:nowrap">${escapeHtml(it.timestamp)}</td>
-      <td style="text-align:right">
-        <button class="btn small secondary" data-idx="${idx}">Delete</button>
-      </td>
-    `;
-    itemsBody.appendChild(tr);
-  });
-
-  // Attach delete handlers
-  itemsBody.querySelectorAll('button[data-idx]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const idx = Number(btn.getAttribute('data-idx'));
-      currentOrder.items.splice(idx,1);
-      saveJSON(STORAGE.currentOrder, currentOrder);
-      renderItems();
-      updateLiveTotal();
-    });
-  });
-}
-
-function updateLiveTotal(){
-  const total = computeOrderTotal(currentOrder);
-  liveTotalEl.textContent = formatMoney(total);
-}
-
-function escapeHtml(s){
-  if(!s) return '';
-  return String(s).replace(/[&<>"']/g, function(m){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-  });
-}
-
-/* ------------------------
-   Modal for price input
-   ------------------------ */
-function showPriceModal(barcode, suggestedPrice){
-  return new Promise((resolve) => {
-    priceModalRoot.innerHTML = `
-      <div class="modal-backdrop">
-        <div class="modal" role="dialog" aria-modal="true">
-          <h3>Add price</h3>
-          <div style="color:var(--muted);font-size:13px;margin-bottom:8px">Barcode: <strong>${escapeHtml(barcode)}</strong></div>
-          <div style="display:flex;gap:8px; margin-bottom:10px;">
-            <input id="modal-price" type="number" step="0.01" min="0" placeholder="Price" style="flex:1" value="${suggestedPrice !== undefined && suggestedPrice !== null ? suggestedPrice : ''}" />
-            <button id="save-price" class="btn">Save</button>
-          </div>
-
-          <div style="display:flex; gap:8px; justify-content:flex-end;">
-            <button id="cancel-price" class="btn secondary">Cancel</button>
-          </div>
-        </div>
-      </div>
-    `;
-    priceModalRoot.style.display = 'block';
-
-    const saveBtn = document.getElementById('save-price');
-    const cancelBtn = document.getElementById('cancel-price');
-    const modalInput = document.getElementById('modal-price');
-
-    modalInput.focus();
-
-    saveBtn.addEventListener('click', ()=>{
-      const val = modalInput.value.trim();
-      if(val === '' || Number(val) < 0){
-        alert('Please enter a valid price (>= 0).');
-        modalInput.focus();
-        return;
-      }
-      closeModal();
-      resolve({ action: 'save', price: Number(val) });
-    });
-
-    cancelBtn.addEventListener('click', ()=>{
-      closeModal();
-      resolve({ action: 'cancel' });
-    });
-
-    function closeModal(){
-      priceModalRoot.style.display = 'none';
-      priceModalRoot.innerHTML = '';
-    }
-  });
-}
-
-/* ------------------------
-   Add item, persist
-   ------------------------ */
-async function handleScannedCode(code){
-  // Avoid repeated detections quickly
-  const now = Date.now();
-  if(lastDetected.code === code && now - lastDetected.time < 1200) {
-    return;
-  }
-  lastDetected = { code, time: now };
-
-  // Pause scanner so user can input price without continuing detections
-  stopScanner();
-
-  // Suggest price if we have it
-  const suggested = priceMap[code];
-
-  const result = await showPriceModal(code, suggested ?? '');
-  if(result.action === 'save'){
-    const item = { code, price: result.price, timestamp: nowLocal() };
-
-    // Update price map (autofill future)
-    priceMap[code] = result.price;
-
-    // Save
-    currentOrder.items.push(item);
-    saveJSON(STORAGE.priceMap, priceMap);
-    saveJSON(STORAGE.currentOrder, currentOrder);
-
-    renderItems();
-    updateLiveTotal();
-  }
-
-  // Resume scanning automatically after save or cancel
-  startScanner();
-}
-
-/* ------------------------
-   Manual add handler
-   ------------------------ */
-addManualBtn.addEventListener('click', async ()=>{
-  const code = manualCode.value && manualCode.value.trim();
-  if(!code){
-    alert('Please type a barcode to add manually.');
-    manualCode.focus();
-    return;
-  }
-  // Use provided manual price if any; else prompt
-  const manualP = manualPrice.value && manualPrice.value.trim();
-  const suggested = manualP !== '' ? Number(manualP) : (priceMap[code] ?? undefined);
-
-  // Show the same modal flow (keeps UX consistent)
-  const result = await showPriceModal(code, suggested ?? '');
-  if(result.action === 'save'){
-    const item = { code, price: result.price, timestamp: nowLocal() };
-    priceMap[code] = result.price;
-    currentOrder.items.push(item);
-    saveJSON(STORAGE.priceMap, priceMap);
-    saveJSON(STORAGE.currentOrder, currentOrder);
-    renderItems();
-    updateLiveTotal();
-    manualCode.value = '';
-    manualPrice.value = '';
-  }
-});
-
-/* ------------------------
-   Start New Order
-   ------------------------ */
-startOrderBtn.addEventListener('click', ()=>{
-  const total = computeOrderTotal(currentOrder);
-  alert('Order total: ' + formatMoney(total));
-  // Save order to history
-  const order = {
-    id: 'order-' + Date.now(),
-    items: currentOrder.items.slice(),
-    total,
-    createdAt: new Date().toISOString()
-  };
-  orders.push(order);
-  saveJSON(STORAGE.orders, orders);
-
-  // Clear current order
-  currentOrder = { items: [] };
-  saveJSON(STORAGE.currentOrder, currentOrder);
-  renderItems();
-  updateLiveTotal();
-});
-
-/* ------------------------
-   Export CSV of all orders & items
-   ------------------------ */
-exportBtn.addEventListener('click', ()=>{
-  // We'll include both past orders and any current order items grouped by order
-  const allOrders = orders.slice(); // past
-  if(currentOrder.items && currentOrder.items.length){
-    allOrders.push({
-      id: 'current-' + Date.now(),
-      items: currentOrder.items.slice(),
-      total: computeOrderTotal(currentOrder),
-      createdAt: new Date().toISOString()
-    });
-  }
-
-  // Build CSV rows: orderId, orderCreatedAt, barcode, price, itemTimestamp
-  const rows = [['orderId','orderCreatedAt','barcode','price','itemTimestamp']];
-  allOrders.forEach(o=>{
-    (o.items||[]).forEach(it=>{
-      rows.push([o.id, o.createdAt, it.code, Number(it.price).toFixed(2), it.timestamp]);
-    });
-  });
-
-  const csvContent = rows.map(r => r.map(cell => {
-    if(typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-      return '"' + cell.replace(/"/g,'""') + '"';
-    }
-    return cell;
-  }).join(',')).join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'quickscan_orders_' + (new Date().toISOString().replace(/[:.]/g,'-')) + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-});
-
-/* ------------------------
-   Quagga integration
-   ------------------------ */
-function quaggaSupported(){
-  return !!(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function' && window.Quagga);
-}
-
+/* ---------------- Focus-Enhanced Scanner ---------------- */
+function quaggaSupported(){return !!(navigator.mediaDevices&&window.Quagga);}
 async function startScanner(){
-  if(scanning) return;
-  if(!quaggaSupported()){
-    scannerStatus.textContent = '⚠️ camera not available';
-    return;
-  }
-
-  // Setup Quagga config for EAN-13 and EAN-8
-  const constraints = {
-    width: { min: 320, ideal: 1280 },
-    height: { min: 240, ideal: 720 },
-    facingMode: 'environment'
+  if(scanning)return;
+  if(!quaggaSupported()){scannerStatus.textContent='⚠️ camera not available';return;}
+  const constraints={
+    width:{min:320,ideal:1280},
+    height:{min:240,ideal:720},
+    facingMode:'environment',
+    advanced:[
+      {focusMode:'continuous'},
+      {torch:false},
+      {zoom:1.0}
+    ]
   };
-
-  try {
-    window.Quagga.init({
-      inputStream: {
-        type: "LiveStream",
-        constraints,
-        target: interactive,
-        area: { // try to focus center portion (slightly speeds detection)
-          top: "10%",
-          right: "10%",
-          left: "10%",
-          bottom: "10%"
-        }
-      },
-      locator: {
-        patchSize: "medium",
-        halfSample: true
-      },
-      numOfWorkers: navigator.hardwareConcurrency ? Math.max(1, Math.min(4, navigator.hardwareConcurrency - 1)) : 2,
-      decoder: {
-        readers: ["ean_reader","ean_8_reader"] // EAN-13 and EAN-8
-      },
-      locate: true
-    }, function(err){
-      if(err){
-        console.error('Quagga init error', err);
-        scannerStatus.textContent = '⚠️ init failed';
-        return;
-      }
-      window.Quagga.start();
-      scanning = true;
-      scannerStatus.textContent = '🟢 scanning';
-      toggleBtn.textContent = 'Stop Scanning';
+  try{
+    Quagga.init({
+      inputStream:{type:'LiveStream',constraints,target:interactive,area:{top:'10%',right:'10%',left:'10%',bottom:'10%'}},
+      locator:{patchSize:'medium',halfSample:true},
+      numOfWorkers:2,
+      decoder:{readers:['ean_reader','ean_8_reader']},
+      locate:true
+    },err=>{
+      if(err){console.error(err);scannerStatus.textContent='⚠️ init failed';return;}
+      Quagga.start();
+      // Try adjusting track focus directly after start (for browsers supporting it)
+      setTimeout(async()=>{
+        try{
+          const track=Quagga.CameraAccess.getActiveTrack();
+          const caps=track.getCapabilities?.();
+          if(caps&&caps.focusMode){
+            await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
+          }
+        }catch(e){console.log('focus mode not supported',e);}
+      },1000);
+      scanning=true;
+      scannerStatus.textContent='🟢 scanning';
+      toggleBtn.textContent='Stop Scanning';
     });
-
-    // On detection
-    window.Quagga.onDetected(det => {
-      // Normalize code
-      const code = (det && det.codeResult && det.codeResult.code) ? det.codeResult.code.trim() : null;
-      if(!code) return;
-      // Only EAN-8 or EAN-13 (readers ensure that but double-check)
-      if(!/^\d{8}$/.test(code) && !/^\d{13}$/.test(code)) return;
+    Quagga.onDetected(det=>{
+      const code=det?.codeResult?.code?.trim();
+      if(!code)return;
+      if(!/^\d{8}$/.test(code)&&!/^\d{13}$/.test(code))return;
       handleScannedCode(code);
     });
-
-    // optionally handle processed (for debugging or overlay)
-    window.Quagga.onProcessed(function(result){
-      // We could draw overlays here if desired
-    });
-
-  } catch (e){
-    console.error('Quagga start error', e);
-    scannerStatus.textContent = '⚠️ error';
-  }
+  }catch(e){console.error(e);scannerStatus.textContent='⚠️ error';}
 }
-
 function stopScanner(){
-  if(!scanning) return;
-  try{
-    if(window.Quagga){
-      window.Quagga.offDetected && window.Quagga.offDetected();
-      window.Quagga.stop();
-      // Clear the live stream element to avoid blank area; Quagga leaves a canvas/video child, we'll keep container small
-      const interactiveEl = document.getElementById('interactive');
-      interactiveEl.innerHTML = '';
-    }
-  }catch(e){
-    console.warn(e);
-  }
-  scanning = false;
-  scannerStatus.textContent = '🔴 stopped';
-  toggleBtn.textContent = 'Start Scanning';
+  if(!scanning)return;
+  try{Quagga.stop();interactive.innerHTML='';}catch(e){}
+  scanning=false;scannerStatus.textContent='🔴 stopped';toggleBtn.textContent='Start Scanning';
 }
-
-/* toggle */
-toggleBtn.addEventListener('click', ()=>{
-  if(scanning) {
-    stopScanner();
-  } else {
-    startScanner();
-  }
-});
-
-/* init on load: render existing data */
-(function init(){
-  renderItems();
-  updateLiveTotal();
-
-  // If previously scanning before refresh we don't auto-start camera (privacy), but leave ready.
-  scannerStatus.textContent = '🔴 stopped';
-})();
-
-/* Clean up Quagga on page unload */
-window.addEventListener('beforeunload', ()=>{
-  try{ stopScanner(); } catch(e){}
-});
-
-/* Provide a small visual for camera permission denial -> allow manual entry always */
-if(!quaggaSupported()){
-  scannerStatus.textContent = '⚠️ camera not supported';
-}
-
-/* Accessibility: enter key in manual inputs triggers add */
-manualCode.addEventListener('keydown', (e)=> { if(e.key === 'Enter') addManualBtn.click(); });
-manualPrice.addEventListener('keydown', (e)=> { if(e.key === 'Enter') addManualBtn.click(); });
-
+toggleBtn.onclick=()=>scanning?stopScanner():startScanner();
+(function init(){renderItems();updateLiveTotal();scannerStatus.textContent='🔴 stopped';})();
+window.addEventListener('beforeunload',()=>{try{stopScanner();}catch(e){}});
+manualCode.addEventListener('keydown',e=>e.key==='Enter'&&addManualBtn.click());
+manualPrice.addEventListener('keydown',e=>e.key==='Enter'&&addManualBtn.click());
 </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+"<!DOCTYPE html>
+<html lang=\"en\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>Barcode Scanner</title>
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+    <script src=\"https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js\"></script>
     <style>
         * {
             margin: 0;
@@ -140,7 +140,7 @@
             color: #6e6e73;
         }
 
-        input[type="range"] {
+        input[type=\"range\"] {
             width: 100%;
             height: 4px;
             border-radius: 2px;
@@ -149,7 +149,7 @@
             -webkit-appearance: none;
         }
 
-        input[type="range"]::-webkit-slider-thumb {
+        input[type=\"range\"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 20px;
@@ -159,7 +159,7 @@
             cursor: pointer;
         }
 
-        input[type="range"]::-moz-range-thumb {
+        input[type=\"range\"]::-moz-range-thumb {
             width: 20px;
             height: 20px;
             border-radius: 50%;
@@ -187,7 +187,7 @@
             gap: 12px;
         }
 
-        input[type="text"], input[type="number"] {
+        input[type=\"text\"], input[type=\"number\"] {
             flex: 1;
             padding: 12px;
             border: 1px solid #d1d1d6;
@@ -197,7 +197,7 @@
             transition: border-color 0.2s ease;
         }
 
-        input[type="text"]:focus, input[type="number"]:focus {
+        input[type=\"text\"]:focus, input[type=\"number\"]:focus {
             border-color: #007aff;
         }
 
@@ -370,40 +370,40 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class=\"container\">
         <h1>Barcode Scanner</h1>
 
         <!-- Scanner Section -->
-        <div class="scanner-section">
-            <div id="interactive" class="viewport"></div>
-            <div class="controls">
-                <button id="startBtn" class="btn-primary">Start Scanning</button>
-                <button id="stopBtn" class="btn-secondary" style="display: none;">Stop Scanning</button>
+        <div class=\"scanner-section\">
+            <div id=\"interactive\" class=\"viewport\"></div>
+            <div class=\"controls\">
+                <button id=\"startBtn\" class=\"btn-primary\">Start Scanning</button>
+                <button id=\"stopBtn\" class=\"btn-secondary\" style=\"display: none;\">Stop Scanning</button>
             </div>
-            <div class="zoom-control" id="zoomControl">
-                <label for="zoomSlider">Zoom</label>
-                <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1">
+            <div class=\"zoom-control\" id=\"zoomControl\">
+                <label for=\"zoomSlider\">Zoom</label>
+                <input type=\"range\" id=\"zoomSlider\" min=\"1\" max=\"3\" step=\"0.1\" value=\"1\">
             </div>
-            <div id="statusMessage" class="status-message"></div>
+            <div id=\"statusMessage\" class=\"status-message\"></div>
         </div>
 
         <!-- Manual Entry Section -->
-        <div class="manual-entry">
+        <div class=\"manual-entry\">
             <h3>Manual Barcode Entry</h3>
-            <div class="input-group">
-                <input type="text" id="manualBarcode" placeholder="Enter barcode manually">
-                <button id="addManualBtn" class="btn-secondary">Add Manually</button>
+            <div class=\"input-group\">
+                <input type=\"text\" id=\"manualBarcode\" placeholder=\"Enter barcode manually\">
+                <button id=\"addManualBtn\" class=\"btn-secondary\">Add Manually</button>
             </div>
         </div>
 
         <!-- Current Order Section -->
-        <div class="order-section">
-            <div class="order-header">
+        <div class=\"order-section\">
+            <div class=\"order-header\">
                 <h2>Current Order</h2>
-                <div class="order-total" id="orderTotal">Total: $0.00</div>
+                <div class=\"order-total\" id=\"orderTotal\">Total: $0.00</div>
             </div>
-            <div class="table-container">
-                <table id="orderTable">
+            <div class=\"table-container\">
+                <table id=\"orderTable\">
                     <thead>
                         <tr>
                             <th>Barcode</th>
@@ -411,31 +411,31 @@
                             <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody id="orderTableBody">
+                    <tbody id=\"orderTableBody\">
                         <tr>
-                            <td colspan="3" class="empty-state">No items scanned yet</td>
+                            <td colspan=\"3\" class=\"empty-state\">No items scanned yet</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="action-buttons">
-                <button id="newOrderBtn" class="btn-success">Start New Order</button>
-                <button id="exportBtn" class="btn-secondary">Export CSV</button>
+            <div class=\"action-buttons\">
+                <button id=\"newOrderBtn\" class=\"btn-success\">Start New Order</button>
+                <button id=\"exportBtn\" class=\"btn-secondary\">Export CSV</button>
             </div>
         </div>
     </div>
 
     <!-- Price Modal -->
-    <div id="priceModal" class="price-modal">
-        <div class="price-modal-content">
+    <div id=\"priceModal\" class=\"price-modal\">
+        <div class=\"price-modal-content\">
             <h3>Enter Price</h3>
-            <label for="barcodeDisplay">Barcode</label>
-            <input type="text" id="barcodeDisplay" readonly>
-            <label for="priceInput">Price ($)</label>
-            <input type="number" id="priceInput" step="0.01" min="0" placeholder="0.00">
-            <div class="modal-buttons">
-                <button id="savePriceBtn" class="btn-primary">Save</button>
-                <button id="cancelPriceBtn" class="btn-secondary">Cancel</button>
+            <label for=\"barcodeDisplay\">Barcode</label>
+            <input type=\"text\" id=\"barcodeDisplay\" readonly>
+            <label for=\"priceInput\">Price ($)</label>
+            <input type=\"number\" id=\"priceInput\" step=\"0.01\" min=\"0\" placeholder=\"0.00\">
+            <div class=\"modal-buttons\">
+                <button id=\"savePriceBtn\" class=\"btn-primary\">Save</button>
+                <button id=\"cancelPriceBtn\" class=\"btn-secondary\">Cancel</button>
             </div>
         </div>
     </div>
@@ -482,23 +482,23 @@
             
             Quagga.init({
                 inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
+                    name: \"Live\",
+                    type: \"LiveStream\",
                     target: interactive,
                     constraints: {
                         width: 640,
                         height: 480,
-                        facingMode: "environment"
+                        facingMode: \"environment\"
                     }
                 },
                 decoder: {
-                    readers: ["ean_reader"],
+                    readers: [\"ean_reader\"],
                     multiple: false
                 },
                 locate: true,
                 locator: {
                     halfSample: true,
-                    patchSize: "medium"
+                    patchSize: \"medium\"
                 }
             }, function(err) {
                 if (err) {
@@ -535,7 +535,7 @@
                     
                     if (videoTrack && videoTrack.applyConstraints) {
                         videoTrack.applyConstraints({
-                            advanced: [{ focusMode: "manual" }]
+                            advanced: [{ focusMode: \"manual\" }]
                         }).catch(() => {});
                     }
                 });
@@ -630,7 +630,7 @@
             const tbody = document.getElementById('orderTableBody');
             
             if (currentOrder.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No items scanned yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan=\"3\" class=\"empty-state\">No items scanned yet</td></tr>';
                 document.getElementById('orderTotal').textContent = 'Total: $0.00';
                 return;
             }
@@ -672,7 +672,9 @@
 
             orderHistory.push(order);
             
-            alert(`Order completed!\nTotal: $${total.toFixed(2)}\nItems: ${currentOrder.length}`);
+            alert(`Order completed!
+Total: $${total.toFixed(2)}
+Items: ${currentOrder.length}`);
 
             // Clear current order
             currentOrder = [];
@@ -688,12 +690,14 @@
                 return;
             }
 
-            let csv = 'Order ID,Item Barcode,Price,Timestamp\n';
+            let csv = 'Order ID,Item Barcode,Price,Timestamp
+';
 
             // Add order history
             orderHistory.forEach(order => {
                 order.items.forEach(item => {
-                    csv += `${order.id},${item.barcode},${item.price.toFixed(2)},${item.timestamp}\n`;
+                    csv += `${order.id},${item.barcode},${item.price.toFixed(2)},${item.timestamp}
+`;
                 });
             });
 
@@ -701,7 +705,8 @@
             if (currentOrder.length > 0) {
                 const currentOrderId = 'CURRENT';
                 currentOrder.forEach(item => {
-                    csv += `${currentOrderId},${item.barcode},${item.price.toFixed(2)},${item.timestamp}\n`;
+                    csv += `${currentOrderId},${item.barcode},${item.price.toFixed(2)},${item.timestamp}
+`;
                 });
             }
 
@@ -780,3 +785,4 @@
     </script>
 </body>
 </html>
+"

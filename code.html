@@ -1,84 +1,368 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Barcode Scanner with CSV Export</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barcode Scanner — Simple POS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f6fa; color: #333; text-align: center; margin: 0; padding: 20px; }
-    h1 { font-size: 1.6em; margin-bottom: 10px; }
-    #interactive { width: 100%; max-width: 400px; margin: 0 auto; }
-    video { width: 100%; border-radius: 10px; background: #000; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; }
-    th { background: #eee; }
-    button { margin-top: 10px; padding: 8px 12px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    :root{
+      --bg:#f7f8fb; --card:#ffffff; --muted:#64748b; --accent:#2b8aef; --success:#16a34a; --danger:#ef4444;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:linear-gradient(180deg,var(--bg),#eef2f7); color:#0f172a}
+    .container{max-width:1000px;margin:24px auto;padding:18px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:14px;margin-top:18px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr;}}
+
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 20px rgba(12,18,30,0.06)}
+
+    /* Scanner area */
+    #scanner-area{position:relative;min-height:320px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:10px}
+    #interactive{width:100%;height:100%;min-height:320px}
+    #overlay{position:absolute;inset:0;pointer-events:none}
+    #overlay .guide{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:80%;height:34%;border:2px dashed rgba(255,255,255,0.6);border-radius:8px;box-shadow:0 4px 18px rgba(11,14,28,0.2), inset 0 1px 0 rgba(255,255,255,0.06)}
+
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .btn{padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(43,138,239,0.12)}
+    .btn.warn{background:var(--success)}
+    .btn.danger{background:var(--danger)}
+
+    /* Right column */
+    .meta{display:flex;flex-direction:column;gap:12px}
+    .small{font-size:12px;color:var(--muted)}
+
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid #f1f5f9}
+    th{font-weight:600;color:var(--muted)}
+    .muted{color:var(--muted);font-size:13px}
+
+    .row-actions{display:flex;gap:8px}
+    .pill{display:inline-block;padding:6px 8px;border-radius:999px;font-size:12px;background:#f1f5f9;color:#0f172a}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:60}
+    .modal{width:92%;max-width:420px;background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.28)}
+    .modal h3{margin:0 0 8px}
+    .form-row{display:flex;gap:8px;align-items:center}
+    input[type="number"],input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef8}
+
+    .history{max-height:260px;overflow:auto}
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Barcode Scanner — Simple Orders</h1>
+        <p class="lead">Scan items with your camera, enter their price, save orders locally, and export CSV.</p>
+      </div>
+      <div class="small">Saved locally • Mobile-friendly</div>
+    </header>
 
-  <h1>Barcode Scanner App</h1>
-  <p>Scan a barcode using your camera below.</p>
-  
-  <div id="interactive" class="viewport"></div>
+    <div class="grid">
+      <div class="card">
+        <div id="scanner-area">
+          <div id="interactive"></div>
+          <div id="overlay"><div class="guide"></div></div>
+        </div>
 
-  <table id="dataTable">
-    <thead>
-      <tr><th>Barcode</th><th>Price (₹)</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  
-  <button id="exportBtn">Export CSV</button>
+        <div class="controls">
+          <button id="startBtn" class="btn">Start Scanning</button>
+          <button id="stopBtn" class="btn ghost">Stop</button>
+          <button id="resumeBtn" class="btn ghost">Resume After Scan</button>
+          <button id="newOrderBtn" class="btn warn">Start New Order</button>
+          <button id="exportBtn" class="btn ghost">Export CSV</button>
+        </div>
 
+        <div style="margin-top:12px" class="small">Tip: Allow camera permission; use the rear camera on mobile for better results.</div>
+      </div>
+
+      <div class="meta">
+        <div class="card">
+          <h3 style="margin:0 0 8px">Current Order</h3>
+          <div class="small">Items for the active order (not yet finalized)</div>
+          <div style="margin-top:10px;overflow:auto">
+            <table id="currentTable">
+              <thead><tr><th>Barcode</th><th>Price</th><th>Time</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <div class="muted">Items: <span id="currentCount">0</span></div>
+            <div class="muted">Total: ₹ <span id="currentTotal">0.00</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 8px">Order History</h3>
+          <div class="small">Previously completed orders (persisted)</div>
+          <div class="history" style="margin-top:10px">
+            <table id="historyTable">
+              <thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Built with QuaggaJS • Data stored in localStorage</footer>
+  </div>
+
+  <!-- Price modal -->
+  <div id="priceModal" class="modal-backdrop" style="display:none">
+    <div class="modal">
+      <h3>Enter price for barcode</h3>
+      <div class="small" id="detectedCode" style="margin-bottom:8px">Barcode: <strong></strong></div>
+      <div class="form-row">
+        <input id="priceInput" type="number" step="0.01" placeholder="Price (e.g., 199.99)" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button id="cancelModal" class="btn ghost">Cancel</button>
+        <button id="savePrice" class="btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
   <script>
-    const tableBody = document.querySelector("#dataTable tbody");
-    const exportBtn = document.getElementById("exportBtn");
-    let scannedItems = [];
+    // --- App state and persistence ---
+    const STORAGE_KEY = 'barcode_app_orders_v1';
+    let state = {
+      currentOrder: { id: generateId(), date: new Date().toISOString(), items: [] },
+      history: [],
+      scanning: false,
+      pausedAfterScan: false
+    };
 
-    Quagga.init({
-      inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: document.querySelector("#interactive"),
-        constraints: { facingMode: "environment" }
-      },
-      decoder: { readers: ["ean_reader", "code_128_reader", "upc_reader", "code_39_reader"] }
-    }, function(err) {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      Quagga.start();
-      console.log("Quagga started");
-    });
-
-    Quagga.onDetected(function(result) {
-      const code = result.codeResult.code;
-      if (!scannedItems.find(item => item.barcode === code)) {
-        const price = prompt(`Enter price for ${code}:`);
-        if (price) {
-          scannedItems.push({ barcode: code, price });
-          const row = `<tr><td>${code}</td><td>₹${price}</td></tr>`;
-          tableBody.insertAdjacentHTML("beforeend", row);
+    // Load saved state from localStorage
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          if(parsed.currentOrder) state.currentOrder = parsed.currentOrder;
+          if(parsed.history) state.history = parsed.history;
         }
+      }catch(e){console.warn('Failed to load state', e)}
+    }
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({currentOrder: state.currentOrder, history: state.history}));
+    }
+
+    // --- Helpers ---
+    function generateId(){return 'ord_' + Math.random().toString(36).slice(2,10)}
+    function formatMoney(x){return Number(x||0).toFixed(2)}
+    function formatDate(iso){const d=new Date(iso); return d.toLocaleString();}
+
+    // --- UI elements ---
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const newOrderBtn = document.getElementById('newOrderBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const currentTableBody = document.querySelector('#currentTable tbody');
+    const historyTableBody = document.querySelector('#historyTable tbody');
+    const currentCount = document.getElementById('currentCount');
+    const currentTotalEl = document.getElementById('currentTotal');
+
+    const priceModal = document.getElementById('priceModal');
+    const detectedCodeEl = document.querySelector('#detectedCode strong');
+    const priceInput = document.getElementById('priceInput');
+    const savePriceBtn = document.getElementById('savePrice');
+    const cancelModalBtn = document.getElementById('cancelModal');
+
+    // --- Quagga setup and control ---
+    function startScanner(){
+      if(state.scanning) return;
+      const config = {
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: document.querySelector('#interactive'),
+          constraints: { facingMode: "environment" }
+        },
+        decoder: {
+          readers: ["ean_reader","ean_8_reader","code_128_reader","upc_reader","upc_e_reader","code_39_reader"]
+        },
+        locate: true
+      };
+
+      Quagga.init(config, function(err){
+        if(err){console.error(err); alert('Could not start camera. Make sure you are on HTTPS and allowed camera access.'); return}
+        Quagga.start();
+        state.scanning = true;
+        state.pausedAfterScan = false;
+      });
+
+      Quagga.onDetected(onDetected);
+    }
+
+    function stopScanner(){
+      if(!state.scanning) return;
+      Quagga.stop();
+      Quagga.offDetected(onDetected);
+      state.scanning = false;
+    }
+
+    function onDetected(result){
+      // stop scanning immediately after first good detection
+      if(!result || !result.codeResult || !result.codeResult.code) return;
+      const code = result.codeResult.code;
+      // Debounce repeated calls
+      stopScanner();
+      state.pausedAfterScan = true;
+      showPriceModal(code);
+    }
+
+    // Resume after user has finished saving price manually
+    function resumeScanner(){
+      if(state.scanning) return; // already running
+      startScanner();
+    }
+
+    // --- Modal interactions ---
+    let lastDetectedCode = null;
+    function showPriceModal(code){
+      lastDetectedCode = code;
+      detectedCodeEl.textContent = code;
+      priceInput.value = '';
+      priceModal.style.display = 'flex';
+      priceInput.focus();
+    }
+    function hidePriceModal(){
+      priceModal.style.display = 'none';
+      lastDetectedCode = null;
+    }
+
+    savePriceBtn.addEventListener('click', () => {
+      const raw = priceInput.value.trim();
+      if(raw === '' || isNaN(raw)) { alert('Please enter a valid price'); priceInput.focus(); return; }
+      const price = Number(raw);
+      addItemToCurrentOrder({ barcode: lastDetectedCode, price, time: new Date().toISOString() });
+      hidePriceModal();
+      // don't auto-resume; require manual resume to prevent accidental double-scans
+    });
+
+    cancelModalBtn.addEventListener('click', ()=>{
+      hidePriceModal();
+    });
+
+    // allow pressing Enter to save
+    priceInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ savePriceBtn.click(); }});
+
+    // --- Order & table logic ---
+    function addItemToCurrentOrder(item){
+      state.currentOrder.items.push(item);
+      saveState();
+      renderCurrentOrder();
+      renderHistory();
+    }
+
+    function renderCurrentOrder(){
+      currentTableBody.innerHTML = '';
+      const items = state.currentOrder.items || [];
+      items.forEach((it, idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${it.barcode}</td><td>₹ ${formatMoney(it.price)}</td><td>${formatDate(it.time)}</td><td class="row-actions"><button data-idx="${idx}" class="btn ghost">Delete</button></td>`;
+        currentTableBody.appendChild(tr);
+      });
+      currentCount.textContent = items.length;
+      const total = items.reduce((s,i)=>s + Number(i.price || 0), 0);
+      currentTotalEl.textContent = formatMoney(total);
+
+      // attach delete handlers
+      currentTableBody.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const idx = Number(btn.getAttribute('data-idx'));
+          if(!confirm('Delete this item from current order?')) return;
+          state.currentOrder.items.splice(idx,1);
+          saveState(); renderCurrentOrder(); renderHistory();
+        });
+      });
+    }
+
+    function renderHistory(){
+      historyTableBody.innerHTML = '';
+      (state.history || []).slice().reverse().forEach(ord=>{
+        const total = ord.items.reduce((s,i)=>s + Number(i.price || 0), 0);
+        const tdItems = ord.items.length;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${ord.id}</td><td>${formatDate(ord.date)}</td><td>${tdItems}</td><td>₹ ${formatMoney(total)}</td>`;
+        historyTableBody.appendChild(tr);
+      });
+    }
+
+    function startNewOrder(){
+      // finalize current order only if it has items
+      if(state.currentOrder.items && state.currentOrder.items.length){
+        const total = state.currentOrder.items.reduce((s,i)=>s + Number(i.price || 0), 0);
+        if(!confirm(`Current order total: ₹ ${formatMoney(total)}\n\nStart a new order?`)) return;
+        state.history.push(state.currentOrder);
+        state.currentOrder = { id: generateId(), date: new Date().toISOString(), items: [] };
+        saveState();
+        renderCurrentOrder(); renderHistory();
+      } else {
+        // simply reset
+        state.currentOrder = { id: generateId(), date: new Date().toISOString(), items: [] };
+        saveState(); renderCurrentOrder(); renderHistory();
       }
-    });
+    }
 
-    exportBtn.addEventListener("click", () => {
-      if (scannedItems.length === 0) return alert("No data to export!");
-      let csv = "Barcode,Price (₹)\n" + scannedItems.map(i => `${i.barcode},${i.price}`).join("\n");
-      const blob = new Blob([csv], { type: "text/csv" });
+    // --- CSV Export ---
+    function exportCSV(){
+      // Gather all orders: history plus current
+      const all = [...state.history, state.currentOrder].filter(Boolean);
+      const rows = [['order_id','order_date','barcode','price','item_time']];
+      all.forEach(ord=>{
+        (ord.items||[]).forEach(it=>{
+          rows.push([ord.id, ord.date, it.barcode, String(it.price), it.time]);
+        });
+      });
+      const csvContent = rows.map(r=>r.map(escapeCsv).join(',')).join('\n');
+      const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = "scanned_items.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  </script>
+      const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+      a.download = `barcode_export_${stamp}.csv`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+    function escapeCsv(s){
+      if(s == null) return '';
+      s = String(s);
+      if(s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g,'""') + '"';
+      return s;
+    }
 
+    // --- Button wiring ---
+    startBtn.addEventListener('click', ()=>{ startScanner(); });
+    stopBtn.addEventListener('click', ()=>{ stopScanner(); });
+    resumeBtn.addEventListener('click', ()=>{ resumeScanner(); });
+    newOrderBtn.addEventListener('click', ()=>{ startNewOrder(); });
+    exportBtn.addEventListener('click', ()=>{ exportCSV(); });
+
+    // --- Init ---
+    loadState(); renderCurrentOrder(); renderHistory();
+
+    // Warn user about HTTPS requirement (Quagga/getUserMedia)
+    if(location.protocol !== 'https:' && location.hostname !== 'localhost'){
+      console.warn('Camera access may require HTTPS. Use localhost or serve over HTTPS for camera access.');
+    }
+
+    // Cleanup before unload
+    window.addEventListener('beforeunload', ()=>{ stopScanner(); saveState(); });
+
+  </script>
 </body>
 </html>

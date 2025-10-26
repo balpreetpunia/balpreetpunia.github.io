@@ -1,788 +1,180 @@
-"<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-    <meta charset=\"UTF-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>Barcode Scanner</title>
-    <script src=\"https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js\"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="description" content="A product of emergent.sh" />
+        <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+        <!--
+      Notice the use of  in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
-            padding: 16px;
-            line-height: 1.6;
-        }
+      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+        <title>Emergent | Fullstack App</title>
+        <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
+        <!--
+        These two scripts have been added for the testing, please do not edit or remove them
+        -->
+        <script src="https://unpkg.com/rrweb@latest/dist/rrweb.min.js"></script>
+        <script src="https://d2adkz2s9zrlge.cloudfront.net/rrweb-recorder-20250919-1.js"></script>
+        <!--
+        These two scripts have been added for the Visual Edits, please do not edit or remove them
+        -->
+        <script>
+            // Only load visual edit scripts when inside an iframe and visual edits are enabled
+            if (window.self !== window.top && 'true' === 'true') {
+                // Load debug monitor script
+                var debugScript = document.createElement('script');
+                debugScript.src = 'https://assets.emergent.sh/scripts/debug-monitor.js';
+                document.head.appendChild(debugScript);
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+                // Configure Tailwind
+                window.tailwind = window.tailwind || {};
+                tailwind.config = {
+                    corePlugins: { preflight: false },
+                };
 
-        h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            text-align: center;
-        }
-
-        .scanner-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        #interactive {
-            width: 100%;
-            max-width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-            position: relative;
-        }
-
-        #interactive.viewport {
-            position: relative;
-        }
-
-        #interactive video, #interactive canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .drawingBuffer {
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .controls {
-            margin-top: 16px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary {
-            background: #007aff;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #0051d5;
-        }
-
-        .btn-secondary {
-            background: #e5e5ea;
-            color: #1d1d1f;
-        }
-
-        .btn-secondary:hover {
-            background: #d1d1d6;
-        }
-
-        .btn-danger {
-            background: #ff3b30;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #d93025;
-        }
-
-        .btn-success {
-            background: #34c759;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #2ea44f;
-        }
-
-        .zoom-control {
-            margin-top: 12px;
-            display: none;
-        }
-
-        .zoom-control.active {
-            display: block;
-        }
-
-        .zoom-control label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #6e6e73;
-        }
-
-        input[type=\"range\"] {
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
-            background: #d1d1d6;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type=\"range\"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #007aff;
-            cursor: pointer;
-        }
-
-        input[type=\"range\"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #007aff;
-            cursor: pointer;
-            border: none;
-        }
-
-        .manual-entry {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .manual-entry h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 12px;
-        }
-
-        input[type=\"text\"], input[type=\"number\"] {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #d1d1d6;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        input[type=\"text\"]:focus, input[type=\"number\"]:focus {
-            border-color: #007aff;
-        }
-
-        .price-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        .price-modal.active {
-            display: flex;
-        }
-
-        .price-modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-        }
-
-        .price-modal-content h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .price-modal-content label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #6e6e73;
-        }
-
-        .price-modal-content input {
-            width: 100%;
-            margin-bottom: 16px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-        }
-
-        .order-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .order-header h2 {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .order-total {
-            font-size: 18px;
-            font-weight: 600;
-            color: #007aff;
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 16px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e5ea;
-        }
-
-        th {
-            font-size: 13px;
-            font-weight: 600;
-            color: #6e6e73;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            font-size: 15px;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6e6e73;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .status-message {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .status-message.success {
-            background: #d1f4e0;
-            color: #0f5132;
-            display: block;
-        }
-
-        .status-message.error {
-            background: #f8d7da;
-            color: #842029;
-            display: block;
-        }
-
-        @media (max-width: 640px) {
-            h1 {
-                font-size: 24px;
+                // Load Tailwind CDN
+                var tailwindScript = document.createElement('script');
+                tailwindScript.src = 'https://cdn.tailwindcss.com';
+                document.head.appendChild(tailwindScript);
             }
+        </script>
+    <script defer src="/static/js/bundle.js"></script></head>
+    <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+        <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
 
-            button {
-                min-width: 100px;
-                padding: 10px 16px;
-                font-size: 14px;
-            }
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
 
-            .order-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class=\"container\">
-        <h1>Barcode Scanner</h1>
-
-        <!-- Scanner Section -->
-        <div class=\"scanner-section\">
-            <div id=\"interactive\" class=\"viewport\"></div>
-            <div class=\"controls\">
-                <button id=\"startBtn\" class=\"btn-primary\">Start Scanning</button>
-                <button id=\"stopBtn\" class=\"btn-secondary\" style=\"display: none;\">Stop Scanning</button>
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+        <a
+            id="emergent-badge"
+            target="_blank"
+            href="https://app.emergent.sh/?utm_source=emergent-badge"
+            style="
+                display: flex !important;
+                align-items: center !important;
+                position: fixed !important;
+                bottom: 20px;
+                right: 20px;
+                text-decoration: none;
+                padding: 6px 10px;
+                font-family: -apple-system, BlinkMacSystemFont,
+                    &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell,
+                    &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;,
+                    sans-serif !important;
+                font-size: 12px !important;
+                z-index: 9999 !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+                border-radius: 8px !important;
+                background-color: #ffffff !important;
+                border: 1px solid rgba(255, 255, 255, 0.25) !important;
+            "
+        >
+            <div
+                style="display: flex; flex-direction: row; align-items: center"
+            >
+                <img
+                    style="width: 20px; height: 20px; margin-right: 8px"
+                    src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4"
+                />
+                <p
+                    style="
+                        color: #000000;
+                        font-family: -apple-system, BlinkMacSystemFont,
+                            &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu,
+                            Cantarell, &quot;Open Sans&quot;,
+                            &quot;Helvetica Neue&quot;, sans-serif !important;
+                        font-size: 12px !important;
+                        align-items: center;
+                        margin-bottom: 0;
+                    "
+                >
+                    Made with Emergent
+                </p>
             </div>
-            <div class=\"zoom-control\" id=\"zoomControl\">
-                <label for=\"zoomSlider\">Zoom</label>
-                <input type=\"range\" id=\"zoomSlider\" min=\"1\" max=\"3\" step=\"0.1\" value=\"1\">
-            </div>
-            <div id=\"statusMessage\" class=\"status-message\"></div>
-        </div>
-
-        <!-- Manual Entry Section -->
-        <div class=\"manual-entry\">
-            <h3>Manual Barcode Entry</h3>
-            <div class=\"input-group\">
-                <input type=\"text\" id=\"manualBarcode\" placeholder=\"Enter barcode manually\">
-                <button id=\"addManualBtn\" class=\"btn-secondary\">Add Manually</button>
-            </div>
-        </div>
-
-        <!-- Current Order Section -->
-        <div class=\"order-section\">
-            <div class=\"order-header\">
-                <h2>Current Order</h2>
-                <div class=\"order-total\" id=\"orderTotal\">Total: $0.00</div>
-            </div>
-            <div class=\"table-container\">
-                <table id=\"orderTable\">
-                    <thead>
-                        <tr>
-                            <th>Barcode</th>
-                            <th>Price</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id=\"orderTableBody\">
-                        <tr>
-                            <td colspan=\"3\" class=\"empty-state\">No items scanned yet</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class=\"action-buttons\">
-                <button id=\"newOrderBtn\" class=\"btn-success\">Start New Order</button>
-                <button id=\"exportBtn\" class=\"btn-secondary\">Export CSV</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Price Modal -->
-    <div id=\"priceModal\" class=\"price-modal\">
-        <div class=\"price-modal-content\">
-            <h3>Enter Price</h3>
-            <label for=\"barcodeDisplay\">Barcode</label>
-            <input type=\"text\" id=\"barcodeDisplay\" readonly>
-            <label for=\"priceInput\">Price ($)</label>
-            <input type=\"number\" id=\"priceInput\" step=\"0.01\" min=\"0\" placeholder=\"0.00\">
-            <div class=\"modal-buttons\">
-                <button id=\"savePriceBtn\" class=\"btn-primary\">Save</button>
-                <button id=\"cancelPriceBtn\" class=\"btn-secondary\">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // LocalStorage keys
-        const STORAGE_KEYS = {
-            BARCODE_PRICES: 'barcodePrices',
-            CURRENT_ORDER: 'currentOrder',
-            ORDER_HISTORY: 'orderHistory'
-        };
-
-        // State
-        let isScanning = false;
-        let currentBarcode = null;
-        let currentOrder = [];
-        let barcodePrices = {};
-        let orderHistory = [];
-        let videoStream = null;
-
-        // Load data from localStorage
-        function loadData() {
-            const prices = localStorage.getItem(STORAGE_KEYS.BARCODE_PRICES);
-            const order = localStorage.getItem(STORAGE_KEYS.CURRENT_ORDER);
-            const history = localStorage.getItem(STORAGE_KEYS.ORDER_HISTORY);
-
-            if (prices) barcodePrices = JSON.parse(prices);
-            if (order) currentOrder = JSON.parse(order);
-            if (history) orderHistory = JSON.parse(history);
-
-            updateOrderTable();
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem(STORAGE_KEYS.BARCODE_PRICES, JSON.stringify(barcodePrices));
-            localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
-            localStorage.setItem(STORAGE_KEYS.ORDER_HISTORY, JSON.stringify(orderHistory));
-        }
-
-        // Initialize Quagga
-        function startScanner() {
-            const interactive = document.getElementById('interactive');
-            
-            Quagga.init({
-                inputStream: {
-                    name: \"Live\",
-                    type: \"LiveStream\",
-                    target: interactive,
-                    constraints: {
-                        width: 640,
-                        height: 480,
-                        facingMode: \"environment\"
-                    }
-                },
-                decoder: {
-                    readers: [\"ean_reader\"],
-                    multiple: false
-                },
-                locate: true,
-                locator: {
-                    halfSample: true,
-                    patchSize: \"medium\"
-                }
-            }, function(err) {
-                if (err) {
-                    console.error(err);
-                    showStatus('Failed to start camera: ' + err.message, 'error');
-                    return;
-                }
-                
-                Quagga.start();
-                isScanning = true;
-                
-                // Get video stream for zoom control
-                videoStream = Quagga.CameraAccess.getActiveStreamLabel();
-                const videoTrack = Quagga.CameraAccess.getActiveTrack();
-                
-                if (videoTrack && videoTrack.getCapabilities) {
-                    const capabilities = videoTrack.getCapabilities();
-                    if (capabilities.zoom) {
-                        const zoomControl = document.getElementById('zoomControl');
-                        const zoomSlider = document.getElementById('zoomSlider');
-                        zoomControl.classList.add('active');
-                        zoomSlider.min = capabilities.zoom.min;
-                        zoomSlider.max = capabilities.zoom.max;
-                        zoomSlider.step = capabilities.zoom.step;
-                        zoomSlider.value = videoTrack.getSettings().zoom || capabilities.zoom.min;
-                    }
-                }
-
-                // Add tap to focus
-                interactive.addEventListener('click', function(e) {
-                    const rect = interactive.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width;
-                    const y = (e.clientY - rect.top) / rect.height;
-                    
-                    if (videoTrack && videoTrack.applyConstraints) {
-                        videoTrack.applyConstraints({
-                            advanced: [{ focusMode: \"manual\" }]
-                        }).catch(() => {});
-                    }
-                });
-
-                document.getElementById('startBtn').style.display = 'none';
-                document.getElementById('stopBtn').style.display = 'block';
-                showStatus('Scanner started. Point camera at barcode.', 'success');
+        </a>
+        <script>
+            !(function (t, e) {
+                var o, n, p, r;
+                e.__SV ||
+                    ((window.posthog = e),
+                    (e._i = []),
+                    (e.init = function (i, s, a) {
+                        function g(t, e) {
+                            var o = e.split(".");
+                            2 == o.length && ((t = t[o[0]]), (e = o[1])),
+                                (t[e] = function () {
+                                    t.push(
+                                        [e].concat(
+                                            Array.prototype.slice.call(
+                                                arguments,
+                                                0,
+                                            ),
+                                        ),
+                                    );
+                                });
+                        }
+                        ((p = t.createElement("script")).type =
+                            "text/javascript"),
+                            (p.crossOrigin = "anonymous"),
+                            (p.async = !0),
+                            (p.src =
+                                s.api_host.replace(
+                                    ".i.posthog.com",
+                                    "-assets.i.posthog.com",
+                                ) + "/static/array.js"),
+                            (r =
+                                t.getElementsByTagName(
+                                    "script",
+                                )[0]).parentNode.insertBefore(p, r);
+                        var u = e;
+                        for (
+                            void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                                u.people = u.people || [],
+                                u.toString = function (t) {
+                                    var e = "posthog";
+                                    return (
+                                        "posthog" !== a && (e += "." + a),
+                                        t || (e += " (stub)"),
+                                        e
+                                    );
+                                },
+                                u.people.toString = function () {
+                                    return u.toString(1) + ".people (stub)";
+                                },
+                                o =
+                                    "init me ws ys ps bs capture je Di ks register register_once register_for_session unregister unregister_for_session Ps getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Es $s createPersonProfile Is opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing Ss debug xs getPageViewId captureTraceFeedback captureTraceMetric".split(
+                                        " ",
+                                    ),
+                                n = 0;
+                            n < o.length;
+                            n++
+                        )
+                            g(u, o[n]);
+                        e._i.push([i, s, a]);
+                    }),
+                    (e.__SV = 1));
+            })(document, window.posthog || []);
+            posthog.init("phc_yJW1VjHGGwmCbbrtczfqqNxgBDbhlhOWcdzcIJEOTFE", {
+                api_host: "https://us.i.posthog.com",
+                person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well
             });
-        }
-
-        function stopScanner() {
-            if (isScanning) {
-                Quagga.stop();
-                isScanning = false;
-                document.getElementById('startBtn').style.display = 'block';
-                document.getElementById('stopBtn').style.display = 'none';
-                document.getElementById('zoomControl').classList.remove('active');
-                showStatus('Scanner stopped.', 'success');
-            }
-        }
-
-        // Handle barcode detection
-        Quagga.onDetected(function(result) {
-            if (!isScanning) return;
-            
-            const code = result.codeResult.code;
-            
-            // Validate EAN-13 or EAN-8
-            if ((code.length === 13 || code.length === 8) && /^\d+$/.test(code)) {
-                handleBarcode(code);
-            }
-        });
-
-        // Handle zoom
-        document.getElementById('zoomSlider').addEventListener('input', function(e) {
-            const videoTrack = Quagga.CameraAccess.getActiveTrack();
-            if (videoTrack && videoTrack.applyConstraints) {
-                videoTrack.applyConstraints({
-                    advanced: [{ zoom: parseFloat(e.target.value) }]
-                }).catch(err => console.error('Zoom error:', err));
-            }
-        });
-
-        // Handle barcode
-        function handleBarcode(barcode) {
-            currentBarcode = barcode;
-            
-            // Check if we have a saved price
-            if (barcodePrices[barcode]) {
-                document.getElementById('priceInput').value = barcodePrices[barcode];
-            } else {
-                document.getElementById('priceInput').value = '';
-            }
-            
-            document.getElementById('barcodeDisplay').value = barcode;
-            document.getElementById('priceModal').classList.add('active');
-            document.getElementById('priceInput').focus();
-        }
-
-        // Save price and add to order
-        function savePrice() {
-            const price = parseFloat(document.getElementById('priceInput').value);
-            
-            if (isNaN(price) || price < 0) {
-                alert('Please enter a valid price');
-                return;
-            }
-
-            // Save barcode-price mapping
-            barcodePrices[currentBarcode] = price;
-
-            // Add to current order
-            const item = {
-                barcode: currentBarcode,
-                price: price,
-                timestamp: new Date().toLocaleString()
-            };
-            
-            currentOrder.push(item);
-            saveData();
-            updateOrderTable();
-
-            // Close modal
-            document.getElementById('priceModal').classList.remove('active');
-            showStatus(`Item added: ${currentBarcode} - $${price.toFixed(2)}`, 'success');
-            
-            currentBarcode = null;
-        }
-
-        // Update order table
-        function updateOrderTable() {
-            const tbody = document.getElementById('orderTableBody');
-            
-            if (currentOrder.length === 0) {
-                tbody.innerHTML = '<tr><td colspan=\"3\" class=\"empty-state\">No items scanned yet</td></tr>';
-                document.getElementById('orderTotal').textContent = 'Total: $0.00';
-                return;
-            }
-
-            let html = '';
-            let total = 0;
-
-            currentOrder.forEach(item => {
-                html += `
-                    <tr>
-                        <td>${item.barcode}</td>
-                        <td>$${item.price.toFixed(2)}</td>
-                        <td>${item.timestamp}</td>
-                    </tr>
-                `;
-                total += item.price;
-            });
-
-            tbody.innerHTML = html;
-            document.getElementById('orderTotal').textContent = `Total: $${total.toFixed(2)}`;
-        }
-
-        // Start new order
-        function startNewOrder() {
-            if (currentOrder.length === 0) {
-                alert('No items in current order');
-                return;
-            }
-
-            const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
-            
-            // Save to order history
-            const order = {
-                id: Date.now(),
-                items: [...currentOrder],
-                total: total,
-                timestamp: new Date().toLocaleString()
-            };
-
-            orderHistory.push(order);
-            
-            alert(`Order completed!
-Total: $${total.toFixed(2)}
-Items: ${currentOrder.length}`);
-
-            // Clear current order
-            currentOrder = [];
-            saveData();
-            updateOrderTable();
-            showStatus('New order started', 'success');
-        }
-
-        // Export CSV
-        function exportCSV() {
-            if (orderHistory.length === 0 && currentOrder.length === 0) {
-                alert('No data to export');
-                return;
-            }
-
-            let csv = 'Order ID,Item Barcode,Price,Timestamp
-';
-
-            // Add order history
-            orderHistory.forEach(order => {
-                order.items.forEach(item => {
-                    csv += `${order.id},${item.barcode},${item.price.toFixed(2)},${item.timestamp}
-`;
-                });
-            });
-
-            // Add current order
-            if (currentOrder.length > 0) {
-                const currentOrderId = 'CURRENT';
-                currentOrder.forEach(item => {
-                    csv += `${currentOrderId},${item.barcode},${item.price.toFixed(2)},${item.timestamp}
-`;
-                });
-            }
-
-            // Download
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `orders_${Date.now()}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            
-            showStatus('CSV exported successfully', 'success');
-        }
-
-        // Manual barcode entry
-        function addManualBarcode() {
-            const barcode = document.getElementById('manualBarcode').value.trim();
-            
-            if (!barcode) {
-                alert('Please enter a barcode');
-                return;
-            }
-
-            if (!/^\d+$/.test(barcode) || (barcode.length !== 8 && barcode.length !== 13)) {
-                alert('Please enter a valid EAN-8 or EAN-13 barcode (8 or 13 digits)');
-                return;
-            }
-
-            handleBarcode(barcode);
-            document.getElementById('manualBarcode').value = '';
-        }
-
-        // Show status message
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            statusDiv.className = 'status-message ' + type;
-            
-            setTimeout(() => {
-                statusDiv.className = 'status-message';
-            }, 3000);
-        }
-
-        // Event listeners
-        document.getElementById('startBtn').addEventListener('click', startScanner);
-        document.getElementById('stopBtn').addEventListener('click', stopScanner);
-        document.getElementById('savePriceBtn').addEventListener('click', savePrice);
-        document.getElementById('cancelPriceBtn').addEventListener('click', function() {
-            document.getElementById('priceModal').classList.remove('active');
-            currentBarcode = null;
-        });
-        document.getElementById('newOrderBtn').addEventListener('click', startNewOrder);
-        document.getElementById('exportBtn').addEventListener('click', exportCSV);
-        document.getElementById('addManualBtn').addEventListener('click', addManualBarcode);
-        
-        // Enter key support
-        document.getElementById('priceInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') savePrice();
-        });
-        
-        document.getElementById('manualBarcode').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addManualBarcode();
-        });
-
-        // Close modal on background click
-        document.getElementById('priceModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-                currentBarcode = null;
-            }
-        });
-
-        // Initialize
-        loadData();
-    </script>
-</body>
+        </script>
+    </body>
 </html>
-"

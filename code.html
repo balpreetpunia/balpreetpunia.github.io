@@ -1,302 +1,782 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Barcode POS Web App</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0 10px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    h1 {
-      text-align: center;
-      margin: 20px 0;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding: 16px;
+            line-height: 1.6;
+        }
 
-    #scanner-container {
-      position: relative;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #000;
-      touch-action: manipulation;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    video, canvas {
-      width: 100%;
-      border-radius: 10px;
-    }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
 
-    /* Focus indicator */
-    #focus-indicator {
-      position: absolute;
-      border: 2px solid #00FF00;
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
-      pointer-events: none;
-      display: none;
-      transform: translate(-50%, -50%);
-    }
+        .scanner-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      margin: 10px 0;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+        #interactive {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
 
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        #interactive.viewport {
+            position: relative;
+        }
 
-    button:hover {
-      background-color: #45a049;
-    }
+        #interactive video, #interactive canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
 
-    input[type="text"], input[type="number"], input[type="range"] {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
+        .drawingBuffer {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
+        .controls {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 120px;
+        }
 
-    th {
-      background-color: #f2f2f2;
-    }
+        button:active {
+            transform: scale(0.98);
+        }
 
-    #order-total {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
+        .btn-primary {
+            background: #007aff;
+            color: white;
+        }
 
-    @media (max-width: 500px) {
-      button {
-        flex: 1 1 100%;
-      }
-      .controls {
-        flex-direction: column;
-        gap: 5px;
-      }
-    }
-  </style>
+        .btn-primary:hover {
+            background: #0051d5;
+        }
+
+        .btn-secondary {
+            background: #e5e5ea;
+            color: #1d1d1f;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d1d6;
+        }
+
+        .btn-danger {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d93025;
+        }
+
+        .btn-success {
+            background: #34c759;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2ea44f;
+        }
+
+        .zoom-control {
+            margin-top: 12px;
+            display: none;
+        }
+
+        .zoom-control.active {
+            display: block;
+        }
+
+        .zoom-control label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #6e6e73;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #d1d1d6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007aff;
+            cursor: pointer;
+            border: none;
+        }
+
+        .manual-entry {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .manual-entry h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #007aff;
+        }
+
+        .price-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .price-modal.active {
+            display: flex;
+        }
+
+        .price-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        .price-modal-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .price-modal-content label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #6e6e73;
+        }
+
+        .price-modal-content input {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .order-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .order-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .order-total {
+            font-size: 18px;
+            font-weight: 600;
+            color: #007aff;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        th {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6e6e73;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            font-size: 15px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6e6e73;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-message {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d1f4e0;
+            color: #0f5132;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #842029;
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            button {
+                min-width: 100px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Barcode POS</h1>
+    <div class="container">
+        <h1>Barcode Scanner</h1>
 
-  <div id="scanner-container">
-    <div id="focus-indicator"></div>
-  </div>
+        <!-- Scanner Section -->
+        <div class="scanner-section">
+            <div id="interactive" class="viewport"></div>
+            <div class="controls">
+                <button id="startBtn" class="btn-primary">Start Scanning</button>
+                <button id="stopBtn" class="btn-secondary" style="display: none;">Stop Scanning</button>
+            </div>
+            <div class="zoom-control" id="zoomControl">
+                <label for="zoomSlider">Zoom</label>
+                <input type="range" id="zoomSlider" min="1" max="3" step="0.1" value="1">
+            </div>
+            <div id="statusMessage" class="status-message"></div>
+        </div>
 
-  <div class="controls">
-    <button id="toggle-scan">Start Scanning</button>
-    <input type="range" id="zoom-slider" min="1" max="3" step="0.1" value="1">
-  </div>
+        <!-- Manual Entry Section -->
+        <div class="manual-entry">
+            <h3>Manual Barcode Entry</h3>
+            <div class="input-group">
+                <input type="text" id="manualBarcode" placeholder="Enter barcode manually">
+                <button id="addManualBtn" class="btn-secondary">Add Manually</button>
+            </div>
+        </div>
 
-  <div class="controls">
-    <input type="text" id="manual-barcode" placeholder="Enter barcode manually">
-    <button id="add-manual">Add Manually</button>
-  </div>
+        <!-- Current Order Section -->
+        <div class="order-section">
+            <div class="order-header">
+                <h2>Current Order</h2>
+                <div class="order-total" id="orderTotal">Total: $0.00</div>
+            </div>
+            <div class="table-container">
+                <table id="orderTable">
+                    <thead>
+                        <tr>
+                            <th>Barcode</th>
+                            <th>Price</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody">
+                        <tr>
+                            <td colspan="3" class="empty-state">No items scanned yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="action-buttons">
+                <button id="newOrderBtn" class="btn-success">Start New Order</button>
+                <button id="exportBtn" class="btn-secondary">Export CSV</button>
+            </div>
+        </div>
+    </div>
 
-  <table id="items-table">
-    <thead>
-      <tr>
-        <th>Barcode</th>
-        <th>Price</th>
-        <th>Timestamp</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <!-- Price Modal -->
+    <div id="priceModal" class="price-modal">
+        <div class="price-modal-content">
+            <h3>Enter Price</h3>
+            <label for="barcodeDisplay">Barcode</label>
+            <input type="text" id="barcodeDisplay" readonly>
+            <label for="priceInput">Price ($)</label>
+            <input type="number" id="priceInput" step="0.01" min="0" placeholder="0.00">
+            <div class="modal-buttons">
+                <button id="savePriceBtn" class="btn-primary">Save</button>
+                <button id="cancelPriceBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-  <div id="order-total">Order Total: ₹0</div>
+    <script>
+        // LocalStorage keys
+        const STORAGE_KEYS = {
+            BARCODE_PRICES: 'barcodePrices',
+            CURRENT_ORDER: 'currentOrder',
+            ORDER_HISTORY: 'orderHistory'
+        };
 
-  <div class="controls">
-    <button id="new-order">Start New Order</button>
-    <button id="export-csv">Export CSV</button>
-  </div>
+        // State
+        let isScanning = false;
+        let currentBarcode = null;
+        let currentOrder = [];
+        let barcodePrices = {};
+        let orderHistory = [];
+        let videoStream = null;
 
-  <script>
-    let scanning = false;
-    let currentOrder = [];
-    let barcodePrices = JSON.parse(localStorage.getItem('barcodePrices') || '{}');
-    let allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]');
+        // Load data from localStorage
+        function loadData() {
+            const prices = localStorage.getItem(STORAGE_KEYS.BARCODE_PRICES);
+            const order = localStorage.getItem(STORAGE_KEYS.CURRENT_ORDER);
+            const history = localStorage.getItem(STORAGE_KEYS.ORDER_HISTORY);
 
-    const itemsTableBody = document.querySelector('#items-table tbody');
-    const orderTotalElem = document.getElementById('order-total');
-    const focusIndicator = document.getElementById('focus-indicator');
-    const scannerContainer = document.getElementById('scanner-container');
+            if (prices) barcodePrices = JSON.parse(prices);
+            if (order) currentOrder = JSON.parse(order);
+            if (history) orderHistory = JSON.parse(history);
 
-    function saveData() {
-      localStorage.setItem('barcodePrices', JSON.stringify(barcodePrices));
-      localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
-      localStorage.setItem('allOrders', JSON.stringify(allOrders));
-    }
-
-    function updateTable() {
-      itemsTableBody.innerHTML = '';
-      let total = 0;
-      currentOrder.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${item.barcode}</td><td>₹${item.price}</td><td>${item.timestamp}</td>`;
-        itemsTableBody.appendChild(row);
-        total += parseFloat(item.price);
-      });
-      orderTotalElem.textContent = `Order Total: ₹${total.toFixed(2)}`;
-      saveData();
-    }
-
-    function promptPrice(barcode) {
-      let price = barcodePrices[barcode] || '';
-      price = prompt(`Enter price for barcode: ${barcode}`, price);
-      if(price !== null && price !== '') {
-        barcodePrices[barcode] = price;
-        const timestamp = new Date().toLocaleString();
-        currentOrder.push({ barcode, price, timestamp });
-        updateTable();
-      }
-    }
-
-    function startScanner() {
-      Quagga.init({
-        inputStream : {
-          name : "Live",
-          type : "LiveStream",
-          target: scannerContainer,
-          constraints: {
-            facingMode: "environment",
-            width: { min: 640 },
-            height: { min: 480 },
-            zoom: 1
-          }
-        },
-        decoder: {
-          readers: ["ean_reader", "ean_8_reader"]
+            updateOrderTable();
         }
-      }, function(err) {
-          if (err) { console.log(err); return; }
-          Quagga.start();
-          scanning = true;
-          document.getElementById('toggle-scan').textContent = 'Stop Scanning';
-      });
 
-      Quagga.onDetected(data => {
-        Quagga.pause();
-        promptPrice(data.codeResult.code);
-        Quagga.start();
-      });
-    }
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem(STORAGE_KEYS.BARCODE_PRICES, JSON.stringify(barcodePrices));
+            localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
+            localStorage.setItem(STORAGE_KEYS.ORDER_HISTORY, JSON.stringify(orderHistory));
+        }
 
-    function stopScanner() {
-      Quagga.stop();
-      scanning = false;
-      document.getElementById('toggle-scan').textContent = 'Start Scanning';
-    }
+        // Initialize Quagga
+        function startScanner() {
+            const interactive = document.getElementById('interactive');
+            
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: interactive,
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["ean_reader"],
+                    multiple: false
+                },
+                locate: true,
+                locator: {
+                    halfSample: true,
+                    patchSize: "medium"
+                }
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    showStatus('Failed to start camera: ' + err.message, 'error');
+                    return;
+                }
+                
+                Quagga.start();
+                isScanning = true;
+                
+                // Get video stream for zoom control
+                videoStream = Quagga.CameraAccess.getActiveStreamLabel();
+                const videoTrack = Quagga.CameraAccess.getActiveTrack();
+                
+                if (videoTrack && videoTrack.getCapabilities) {
+                    const capabilities = videoTrack.getCapabilities();
+                    if (capabilities.zoom) {
+                        const zoomControl = document.getElementById('zoomControl');
+                        const zoomSlider = document.getElementById('zoomSlider');
+                        zoomControl.classList.add('active');
+                        zoomSlider.min = capabilities.zoom.min;
+                        zoomSlider.max = capabilities.zoom.max;
+                        zoomSlider.step = capabilities.zoom.step;
+                        zoomSlider.value = videoTrack.getSettings().zoom || capabilities.zoom.min;
+                    }
+                }
 
-    document.getElementById('toggle-scan').addEventListener('click', () => {
-      if(scanning) stopScanner();
-      else startScanner();
-    });
+                // Add tap to focus
+                interactive.addEventListener('click', function(e) {
+                    const rect = interactive.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    
+                    if (videoTrack && videoTrack.applyConstraints) {
+                        videoTrack.applyConstraints({
+                            advanced: [{ focusMode: "manual" }]
+                        }).catch(() => {});
+                    }
+                });
 
-    document.getElementById('add-manual').addEventListener('click', () => {
-      const barcode = document.getElementById('manual-barcode').value.trim();
-      if(barcode) {
-        promptPrice(barcode);
-        document.getElementById('manual-barcode').value = '';
-      }
-    });
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'block';
+                showStatus('Scanner started. Point camera at barcode.', 'success');
+            });
+        }
 
-    document.getElementById('new-order').addEventListener('click', () => {
-      if(currentOrder.length === 0) {
-        alert('No items in current order!');
-        return;
-      }
-      const total = currentOrder.reduce((sum, item) => sum + parseFloat(item.price), 0);
-      alert(`Order Total: ₹${total.toFixed(2)}`);
-      allOrders.push([...currentOrder]);
-      currentOrder = [];
-      updateTable();
-      saveData();
-    });
+        function stopScanner() {
+            if (isScanning) {
+                Quagga.stop();
+                isScanning = false;
+                document.getElementById('startBtn').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'none';
+                document.getElementById('zoomControl').classList.remove('active');
+                showStatus('Scanner stopped.', 'success');
+            }
+        }
 
-    document.getElementById('export-csv').addEventListener('click', () => {
-      let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Barcode,Price,Timestamp,OrderIndex\n";
-      allOrders.forEach((order, index) => {
-        order.forEach(item => {
-          csvContent += `${item.barcode},${item.price},${item.timestamp},${index+1}\n`;
+        // Handle barcode detection
+        Quagga.onDetected(function(result) {
+            if (!isScanning) return;
+            
+            const code = result.codeResult.code;
+            
+            // Validate EAN-13 or EAN-8
+            if ((code.length === 13 || code.length === 8) && /^\d+$/.test(code)) {
+                handleBarcode(code);
+            }
         });
-      });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "orders.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
 
-    document.getElementById('zoom-slider').addEventListener('input', (e) => {
-      const track = Quagga.cameraAccess.getActiveTrack();
-      if(track && track.getCapabilities().zoom) {
-        track.applyConstraints({advanced: [{zoom: parseFloat(e.target.value)}]});
-      }
-    });
-
-    // Tap-to-focus
-    scannerContainer.addEventListener('click', async (e) => {
-      const track = Quagga.cameraAccess.getActiveTrack();
-      if(!track) return;
-
-      const capabilities = track.getCapabilities();
-      if(!capabilities.focusMode || !capabilities.focusMode.includes('single-shot')) return;
-
-      const rect = scannerContainer.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-
-      focusIndicator.style.left = `${e.clientX - rect.left}px`;
-      focusIndicator.style.top = `${e.clientY - rect.top}px`;
-      focusIndicator.style.display = 'block';
-      setTimeout(() => { focusIndicator.style.display = 'none'; }, 500);
-
-      try {
-        await track.applyConstraints({
-          advanced: [{ focusMode: 'single-shot', pointsOfInterest: [{ x, y }] }]
+        // Handle zoom
+        document.getElementById('zoomSlider').addEventListener('input', function(e) {
+            const videoTrack = Quagga.CameraAccess.getActiveTrack();
+            if (videoTrack && videoTrack.applyConstraints) {
+                videoTrack.applyConstraints({
+                    advanced: [{ zoom: parseFloat(e.target.value) }]
+                }).catch(err => console.error('Zoom error:', err));
+            }
         });
-      } catch(err) {
-        console.log('Focus not supported:', err);
-      }
-    });
 
-    // Load previous data
-    currentOrder = JSON.parse(localStorage.getItem('currentOrder') || '[]');
-    updateTable();
-  </script>
+        // Handle barcode
+        function handleBarcode(barcode) {
+            currentBarcode = barcode;
+            
+            // Check if we have a saved price
+            if (barcodePrices[barcode]) {
+                document.getElementById('priceInput').value = barcodePrices[barcode];
+            } else {
+                document.getElementById('priceInput').value = '';
+            }
+            
+            document.getElementById('barcodeDisplay').value = barcode;
+            document.getElementById('priceModal').classList.add('active');
+            document.getElementById('priceInput').focus();
+        }
+
+        // Save price and add to order
+        function savePrice() {
+            const price = parseFloat(document.getElementById('priceInput').value);
+            
+            if (isNaN(price) || price < 0) {
+                alert('Please enter a valid price');
+                return;
+            }
+
+            // Save barcode-price mapping
+            barcodePrices[currentBarcode] = price;
+
+            // Add to current order
+            const item = {
+                barcode: currentBarcode,
+                price: price,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            currentOrder.push(item);
+            saveData();
+            updateOrderTable();
+
+            // Close modal
+            document.getElementById('priceModal').classList.remove('active');
+            showStatus(`Item added: ${currentBarcode} - $${price.toFixed(2)}`, 'success');
+            
+            currentBarcode = null;
+        }
+
+        // Update order table
+        function updateOrderTable() {
+            const tbody = document.getElementById('orderTableBody');
+            
+            if (currentOrder.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No items scanned yet</td></tr>';
+                document.getElementById('orderTotal').textContent = 'Total: $0.00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            currentOrder.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.barcode}</td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>${item.timestamp}</td>
+                    </tr>
+                `;
+                total += item.price;
+            });
+
+            tbody.innerHTML = html;
+            document.getElementById('orderTotal').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Start new order
+        function startNewOrder() {
+            if (currentOrder.length === 0) {
+                alert('No items in current order');
+                return;
+            }
+
+            const total = currentOrder.reduce((sum, item) => sum + item.price, 0);
+            
+            // Save to order history
+            const order = {
+                id: Date.now(),
+                items: [...currentOrder],
+                total: total,
+                timestamp: new Date().toLocaleString()
+            };
+
+            orderHistory.push(order);
+            
+            alert(`Order completed!\nTotal: $${total.toFixed(2)}\nItems: ${currentOrder.length}`);
+
+            // Clear current order
+            currentOrder = [];
+            saveData();
+            updateOrderTable();
+            showStatus('New order started', 'success');
+        }
+
+        // Export CSV
+        function exportCSV() {
+            if (orderHistory.length === 0 && currentOrder.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            let csv = 'Order ID,Item Barcode,Price,Timestamp\n';
+
+            // Add order history
+            orderHistory.forEach(order => {
+                order.items.forEach(item => {
+                    csv += `${order.id},${item.barcode},${item.price.toFixed(2)},${item.timestamp}\n`;
+                });
+            });
+
+            // Add current order
+            if (currentOrder.length > 0) {
+                const currentOrderId = 'CURRENT';
+                currentOrder.forEach(item => {
+                    csv += `${currentOrderId},${item.barcode},${item.price.toFixed(2)},${item.timestamp}\n`;
+                });
+            }
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orders_${Date.now()}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showStatus('CSV exported successfully', 'success');
+        }
+
+        // Manual barcode entry
+        function addManualBarcode() {
+            const barcode = document.getElementById('manualBarcode').value.trim();
+            
+            if (!barcode) {
+                alert('Please enter a barcode');
+                return;
+            }
+
+            if (!/^\d+$/.test(barcode) || (barcode.length !== 8 && barcode.length !== 13)) {
+                alert('Please enter a valid EAN-8 or EAN-13 barcode (8 or 13 digits)');
+                return;
+            }
+
+            handleBarcode(barcode);
+            document.getElementById('manualBarcode').value = '';
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + type;
+            
+            setTimeout(() => {
+                statusDiv.className = 'status-message';
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('startBtn').addEventListener('click', startScanner);
+        document.getElementById('stopBtn').addEventListener('click', stopScanner);
+        document.getElementById('savePriceBtn').addEventListener('click', savePrice);
+        document.getElementById('cancelPriceBtn').addEventListener('click', function() {
+            document.getElementById('priceModal').classList.remove('active');
+            currentBarcode = null;
+        });
+        document.getElementById('newOrderBtn').addEventListener('click', startNewOrder);
+        document.getElementById('exportBtn').addEventListener('click', exportCSV);
+        document.getElementById('addManualBtn').addEventListener('click', addManualBarcode);
+        
+        // Enter key support
+        document.getElementById('priceInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') savePrice();
+        });
+        
+        document.getElementById('manualBarcode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addManualBarcode();
+        });
+
+        // Close modal on background click
+        document.getElementById('priceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                currentBarcode = null;
+            }
+        });
+
+        // Initialize
+        loadData();
+    </script>
 </body>
 </html>

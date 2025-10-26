@@ -1,174 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Barcode Scanner</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        header {
-            background-color: #fff;
-            padding: 15px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            font-size: 1.4em;
-            font-weight: 600;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border-bottom: 1px solid #eee;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-        button {
-            background-color: #007bff;
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-        }
-        .delete-btn:hover {
-            background-color: #b52a38;
-        }
-        .search-box input {
-            width: 90%;
-            padding: 8px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        @media (max-width: 600px) {
-            .container { padding: 15px; }
-            table, th, td { font-size: 14px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Scanner with CSV Export</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f6fa; color: #333; text-align: center; margin: 0; padding: 20px; }
+    h1 { font-size: 1.6em; margin-bottom: 10px; }
+    #interactive { width: 100%; max-width: 400px; margin: 0 auto; }
+    video { width: 100%; border-radius: 10px; background: #000; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #eee; }
+    button { margin-top: 10px; padding: 8px 12px; background: #007bff; border: none; color: white; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+  </style>
 </head>
 <body>
 
-    <header>Smart Barcode Scanner</header>
+  <h1>Barcode Scanner App</h1>
+  <p>Scan a barcode using your camera below.</p>
+  
+  <div id="interactive" class="viewport"></div>
 
-    <div class="container">
-        <div id="reader" style="width:100%; height:250px;"></div>
+  <table id="dataTable">
+    <thead>
+      <tr><th>Barcode</th><th>Price (₹)</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  
+  <button id="exportBtn">Export CSV</button>
 
-        <div class="search-box">
-            <input type="text" id="search-bar" placeholder="Search barcode...">
-        </div>
+  <script>
+    const tableBody = document.querySelector("#dataTable tbody");
+    const exportBtn = document.getElementById("exportBtn");
+    let scannedItems = [];
 
-        <table id="item-table">
-            <thead>
-                <tr>
-                    <th>Barcode</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector("#interactive"),
+        constraints: { facingMode: "environment" }
+      },
+      decoder: { readers: ["ean_reader", "code_128_reader", "upc_reader", "code_39_reader"] }
+    }, function(err) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      Quagga.start();
+      console.log("Quagga started");
+    });
 
-        <button id="clear-all" style="margin-top:10px; background-color:#6c757d;">Clear All</button>
-    </div>
-
-    <script>
-        let scannedItems = JSON.parse(localStorage.getItem('scannedItems')) || [];
-
-        function saveToLocalStorage() {
-            localStorage.setItem('scannedItems', JSON.stringify(scannedItems));
+    Quagga.onDetected(function(result) {
+      const code = result.codeResult.code;
+      if (!scannedItems.find(item => item.barcode === code)) {
+        const price = prompt(`Enter price for ${code}:`);
+        if (price) {
+          scannedItems.push({ barcode: code, price });
+          const row = `<tr><td>${code}</td><td>₹${price}</td></tr>`;
+          tableBody.insertAdjacentHTML("beforeend", row);
         }
+      }
+    });
 
-        function renderTable(items = scannedItems) {
-            const tbody = document.querySelector('#item-table tbody');
-            tbody.innerHTML = '';
-            items.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${item.barcode}</td>
-                    <td>${item.price}</td>
-                    <td><button class='delete-btn' onclick='deleteItem(${index})'>Delete</button></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+    exportBtn.addEventListener("click", () => {
+      if (scannedItems.length === 0) return alert("No data to export!");
+      let csv = "Barcode,Price (₹)\n" + scannedItems.map(i => `${i.barcode},${i.price}`).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "scanned_items.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
 
-        function deleteItem(index) {
-            scannedItems.splice(index, 1);
-            saveToLocalStorage();
-            renderTable();
-        }
-
-        document.getElementById('clear-all').addEventListener('click', () => {
-            if (confirm('Clear all items?')) {
-                scannedItems = [];
-                saveToLocalStorage();
-                renderTable();
-            }
-        });
-
-        document.getElementById('search-bar').addEventListener('input', (e) => {
-            const term = e.target.value.trim().toLowerCase();
-            const filtered = scannedItems.filter(item => item.barcode.toLowerCase().includes(term));
-            renderTable(filtered);
-        });
-
-        function onScanSuccess(decodedText) {
-            if (scannedItems.some(item => item.barcode === decodedText)) {
-                alert('Barcode already added!');
-                return;
-            }
-            const price = prompt('Enter price for this item:');
-            if (price && !isNaN(price)) {
-                scannedItems.push({ barcode: decodedText, price: parseFloat(price).toFixed(2) });
-                saveToLocalStorage();
-                renderTable();
-            } else {
-                alert('Invalid price!');
-            }
-        }
-
-        const html5QrCode = new Html5Qrcode('reader');
-        Html5Qrcode.getCameras().then(devices => {
-            if (devices && devices.length) {
-                html5QrCode.start(
-                    { facingMode: 'environment' },
-                    { fps: 10, qrbox: 200 },
-                    onScanSuccess
-                );
-            } else {
-                document.getElementById('reader').innerHTML = 'No camera found.';
-            }
-        }).catch(err => {
-            document.getElementById('reader').innerHTML = 'Camera access denied or not supported.';
-        });
-
-        renderTable();
-    </script>
 </body>
 </html>

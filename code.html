@@ -1,181 +1,259 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>QuickScan POS — Tap-to-Focus & Zoom</title>
+  <meta charset="UTF-8">
+  <title>Barcode POS Web App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0 10px;
+    }
 
-<script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+    }
 
-<style>
-:root{
-  --bg:#f7f8fb;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --accent:#2563eb;
-  --accent-2:#10b981;
-  --danger:#ef4444;
-  --radius:12px;
-  --gap:12px;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:var(--bg);color:#0f172a;padding:16px;display:flex;justify-content:center;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-.container{width:100%;max-width:960px}
-header{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);margin-bottom:12px}
-h1{font-size:18px;margin:0}
-p.lead{margin:0;color:var(--muted);font-size:13px}
-.card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 6px 18px rgba(12,18,36,0.06);margin-bottom:12px}
-#scanner-area{width:100%;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#eef2ff,#ffffff);display:flex;align-items:center;justify-content:center;position:relative;min-height:180px;height:40vw;max-height:360px;touch-action:manipulation;}
-#interactive.viewport{width:100%;height:100%;position:relative;cursor:pointer}
-.scanner-overlay{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.45);color:#fff;padding:6px 8px;border-radius:999px;font-size:13px;display:flex;gap:8px;align-items:center}
-.controls{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.btn{border:0;padding:10px 12px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;background:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(37,99,235,0.12)}
-.btn.secondary{background:linear-gradient(180deg,#fff,#f8fafc);color:#111827;border:1px solid #e6e9f2;box-shadow:none}
-.btn.danger{background:var(--danger)}
-.btn.green{background:var(--accent-2)}
-.btn.small{padding:8px 10px;font-size:13px;border-radius:8px}
-.table-wrap{margin-top:12px;overflow:auto;max-height:260px;border-radius:8px;background:transparent}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px dashed #e6e9f2}
-th{color:var(--muted);font-weight:700;font-size:12px}
-.live-total{margin-top:8px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.manual-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-input[type="text"],input[type="number"]{padding:10px 12px;border-radius:10px;border:1px solid #e6e9f2;font-size:16px;min-width:0;outline:none}
-input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:flex;align-items:center;justify-content:center;z-index:9999}
-.modal{width:92%;max-width:420px;background:var(--card);border-radius:12px;padding:16px;box-shadow:0 12px 30px rgba(2,6,23,0.3)}
-.modal h3{margin:0 0 8px 0}
-.zoom-slider{width:120px;margin-left:8px;}
-footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
-@media(min-width:720px){#scanner-area{height:320px}.manual-row input[type="text"]{flex:1}}
-</style>
+    #scanner-container {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    video, canvas {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    input[type="text"], input[type="number"], input[type="range"] {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    #order-total {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    @media (max-width: 500px) {
+      button {
+        flex: 1 1 100%;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-<header>
-  <div>
-    <h1>QuickScan POS</h1>
-    <p class="lead">Scan EAN-13 / EAN-8 barcodes, add prices, save orders — all offline.</p>
-  </div>
-</header>
+  <h1>Barcode POS</h1>
 
-<div class="card">
-  <div id="scanner-area">
-    <div id="interactive" class="viewport"></div>
-    <div class="scanner-overlay" id="scanner-status">🔴 stopped</div>
+  <div id="scanner-container"></div>
+
+  <div class="controls">
+    <button id="toggle-scan">Start Scanning</button>
+    <input type="range" id="zoom-slider" min="1" max="3" step="0.1" value="1">
   </div>
 
   <div class="controls">
-    <button id="toggle-scan" class="btn">Start Scanning</button>
-    <button id="start-order" class="btn secondary">Start New Order</button>
-    <button id="export-csv" class="btn small secondary">Export CSV</button>
-    <input type="range" min="1" max="3" step="0.05" id="zoom-slider" class="zoom-slider" value="1">
-    <div style="flex:1"></div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div style="font-size:13px;color:var(--muted)">Live order total:</div>
-      <div id="live-total" style="font-weight:800">₹0.00</div>
-    </div>
+    <input type="text" id="manual-barcode" placeholder="Enter barcode manually">
+    <button id="add-manual">Add Manually</button>
   </div>
 
-  <div class="manual-row">
-    <input id="manual-code" type="text" placeholder="Manual barcode (type EAN)"/>
-    <input id="manual-price" type="number" placeholder="Price (optional)" step="0.01" min="0"/>
-    <button id="add-manual" class="btn secondary">Add Manually</button>
+  <table id="items-table">
+    <thead>
+      <tr>
+        <th>Barcode</th>
+        <th>Price</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="order-total">Order Total: ₹0</div>
+
+  <div class="controls">
+    <button id="new-order">Start New Order</button>
+    <button id="export-csv">Export CSV</button>
   </div>
 
-  <div class="table-wrap">
-    <table id="items-table">
-      <thead><tr><th>Barcode</th><th>Price</th><th>Timestamp</th><th></th></tr></thead>
-      <tbody id="items-body"></tbody>
-    </table>
-  </div>
-</div>
+  <script>
+    let scanning = false;
+    let currentOrder = [];
+    let barcodePrices = JSON.parse(localStorage.getItem('barcodePrices') || '{}');
+    let allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]');
 
-<footer>Tip: grant camera access. Tap to focus or use zoom slider if needed.</footer>
-</div>
+    const itemsTableBody = document.querySelector('#items-table tbody');
+    const orderTotalElem = document.getElementById('order-total');
 
-<div id="price-modal" style="display:none;"></div>
+    function saveData() {
+      localStorage.setItem('barcodePrices', JSON.stringify(barcodePrices));
+      localStorage.setItem('currentOrder', JSON.stringify(currentOrder));
+      localStorage.setItem('allOrders', JSON.stringify(allOrders));
+    }
 
-<script>
-const STORAGE={priceMap:'qs_price_map',currentOrder:'qs_current_order',orders:'qs_orders'};
-const saveJSON=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const loadJSON=(k,f)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}};
-let priceMap=loadJSON(STORAGE.priceMap,{}),currentOrder=loadJSON(STORAGE.currentOrder,{items:[]}),orders=loadJSON(STORAGE.orders,[]);
-const toggleBtn=document.getElementById('toggle-scan'),scannerStatus=document.getElementById('scanner-status'),interactive=document.getElementById('interactive'),itemsBody=document.getElementById('items-body'),liveTotalEl=document.getElementById('live-total'),startOrderBtn=document.getElementById('start-order'),exportBtn=document.getElementById('export-csv'),manualCode=document.getElementById('manual-code'),manualPrice=document.getElementById('manual-price'),addManualBtn=document.getElementById('add-manual'),priceModalRoot=document.getElementById('price-modal'),zoomSlider=document.getElementById('zoom-slider');
-let scanning=false,lastDetected={code:null,time:0},activeTrack=null;
+    function updateTable() {
+      itemsTableBody.innerHTML = '';
+      let total = 0;
+      currentOrder.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${item.barcode}</td><td>₹${item.price}</td><td>${item.timestamp}</td>`;
+        itemsTableBody.appendChild(row);
+        total += parseFloat(item.price);
+      });
+      orderTotalElem.textContent = `Order Total: ₹${total.toFixed(2)}`;
+      saveData();
+    }
 
-const nowLocal=()=>new Date().toLocaleString();
-const formatMoney=n=>'₹'+(Number(n)||0).toFixed(2);
-const computeOrderTotal=o=>(o.items||[]).reduce((s,it)=>s+(+it.price||0),0);
-function escapeHtml(s){return s?String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])):''}
-function renderItems(){itemsBody.innerHTML='';(currentOrder.items||[]).forEach((it,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${escapeHtml(it.code)}</td><td>${formatMoney(it.price)}</td><td>${escapeHtml(it.timestamp)}</td><td style="text-align:right"><button class="btn small secondary" data-idx="${i}">Delete</button></td>`;itemsBody.appendChild(tr)});itemsBody.querySelectorAll('button[data-idx]').forEach(b=>b.onclick=()=>{currentOrder.items.splice(+b.dataset.idx,1);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal()})}
-function updateLiveTotal(){liveTotalEl.textContent=formatMoney(computeOrderTotal(currentOrder));}
+    function promptPrice(barcode) {
+      let price = barcodePrices[barcode] || '';
+      price = prompt(`Enter price for barcode: ${barcode}`, price);
+      if(price !== null && price !== '') {
+        barcodePrices[barcode] = price;
+        const timestamp = new Date().toLocaleString();
+        currentOrder.push({ barcode, price, timestamp });
+        updateTable();
+      }
+    }
 
-function showPriceModal(code,suggested){return new Promise(res=>{priceModalRoot.innerHTML=`<div class="modal-backdrop"><div class="modal"><h3>Add price</h3><div style="color:#6b7280;font-size:13px;margin-bottom:8px">Barcode: <strong>${escapeHtml(code)}</strong></div><div style="display:flex;gap:8px;margin-bottom:10px;"><input id="modal-price" type="number" step="0.01" min="0" placeholder="Price" style="flex:1" value="${suggested??''}"/><button id="save-price" class="btn">Save</button></div><div style="display:flex;gap:8px;justify-content:flex-end;"><button id="cancel-price" class="btn secondary">Cancel</button></div></div></div>`;priceModalRoot.style.display='block';const m=document.getElementById('modal-price');m.focus();document.getElementById('save-price').onclick=()=>{const v=m.value.trim();if(v===''||+v<0){alert('Enter valid price');m.focus();return}close();res({action:'save',price:+v})};document.getElementById('cancel-price').onclick=()=>{close();res({action:'cancel'})};function close(){priceModalRoot.style.display='none';priceModalRoot.innerHTML='';}})}
+    function startScanner() {
+      Quagga.init({
+        inputStream : {
+          name : "Live",
+          type : "LiveStream",
+          target: document.querySelector('#scanner-container'),
+          constraints: {
+            facingMode: "environment",
+            width: { min: 640 },
+            height: { min: 480 },
+            zoom: 1
+          }
+        },
+        decoder: {
+          readers: ["ean_reader", "ean_8_reader"]
+        }
+      }, function(err) {
+          if (err) { console.log(err); return; }
+          Quagga.start();
+          scanning = true;
+          document.getElementById('toggle-scan').textContent = 'Stop Scanning';
+      });
 
-async function handleScannedCode(code){const now=Date.now();if(lastDetected.code===code&&now-lastDetected.time<1200)return;lastDetected={code,time:now};stopScanner();const suggested=priceMap[code];const r=await showPriceModal(code,suggested??'');if(r.action==='save'){const item={code,price:r.price,timestamp:nowLocal()};priceMap[code]=r.price;currentOrder.items.push(item);saveJSON(STORAGE.priceMap,priceMap);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();}startScanner();}
+      Quagga.onDetected(data => {
+        Quagga.pause();
+        promptPrice(data.codeResult.code);
+        Quagga.start();
+      });
+    }
 
-addManualBtn.onclick=async()=>{const c=manualCode.value.trim();if(!c)return alert('Enter barcode');const p=manualPrice.value.trim();const s=p!==''?+p:priceMap[c];const r=await showPriceModal(c,s??'');if(r.action==='save'){const it={code:c,price:r.price,timestamp:nowLocal()};priceMap[c]=r.price;currentOrder.items.push(it);saveJSON(STORAGE.priceMap,priceMap);saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();manualCode.value='';manualPrice.value='';}};
-startOrderBtn.onclick=()=>{const t=computeOrderTotal(currentOrder);alert('Order total: '+formatMoney(t));orders.push({id:'order-'+Date.now(),items:currentOrder.items.slice(),total:t,createdAt:new Date().toISOString()});saveJSON(STORAGE.orders,orders);currentOrder={items:[]};saveJSON(STORAGE.currentOrder,currentOrder);renderItems();updateLiveTotal();};
-exportBtn.onclick=()=>{const all=orders.slice();if(currentOrder.items.length)all.push({id:'current-'+Date.now(),items:currentOrder.items.slice(),total:computeOrderTotal(currentOrder),createdAt:new Date().toISOString()});const rows=[['orderId','orderCreatedAt','barcode','price','itemTimestamp']];all.forEach(o=>o.items.forEach(it=>rows.push([o.id,o.createdAt,it.code,(+it.price).toFixed(2),it.timestamp])));const csv=rows.map(r=>r.map(c=>typeof c==='string'&&(c.includes(',')||c.includes('"'))?`"${c.replace(/"/g,'""')}"`:c).join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='orders_'+new Date().toISOString().replace(/[:.]/g,'-')+'.csv';a.click();URL.revokeObjectURL(url);};
+    function stopScanner() {
+      Quagga.stop();
+      scanning = false;
+      document.getElementById('toggle-scan').textContent = 'Start Scanning';
+    }
 
-/* ---------------- Focus & Zoom Enhanced Scanner ---------------- */
-function quaggaSupported(){return !!(navigator.mediaDevices&&window.Quagga);}
-async function startScanner(){
-  if(scanning)return;
-  if(!quaggaSupported()){scannerStatus.textContent='⚠️ camera not available';return;}
-  try{
-    Quagga.init({
-      inputStream:{type:'LiveStream',constraints:{facingMode:'environment'},target:interactive,area:{top:'10%',right:'10%',left:'10%',bottom:'10%'}},
-      locator:{patchSize:'medium',halfSample:true},
-      numOfWorkers:2,
-      decoder:{readers:['ean_reader','ean_8_reader']},
-      locate:true
-    },err=>{
-      if(err){console.error(err);scannerStatus.textContent='⚠️ init failed';return;}
-      Quagga.start();
-      scanning=true;
-      scannerStatus.textContent='🟢 scanning';
-      toggleBtn.textContent='Stop Scanning';
-      // save track for zoom/focus
-      activeTrack=Quagga.CameraAccess.getActiveTrack();
+    document.getElementById('toggle-scan').addEventListener('click', () => {
+      if(scanning) stopScanner();
+      else startScanner();
     });
-    Quagga.onDetected(det=>{
-      const code=det?.codeResult?.code?.trim();
-      if(!code)return;if(!/^\d{8}$/.test(code)&&!/^\d{13}$/.test(code))return;
-      handleScannedCode(code);
+
+    document.getElementById('add-manual').addEventListener('click', () => {
+      const barcode = document.getElementById('manual-barcode').value.trim();
+      if(barcode) {
+        promptPrice(barcode);
+        document.getElementById('manual-barcode').value = '';
+      }
     });
-  }catch(e){console.error(e);scannerStatus.textContent='⚠️ error';}
-}
-function stopScanner(){if(!scanning)return;try{Quagga.stop();interactive.innerHTML='';}catch(e){}scanning=false;scannerStatus.textContent='🔴 stopped';toggleBtn.textContent='Start Scanning';activeTrack=null;}
 
-toggleBtn.onclick=()=>scanning?stopScanner():startScanner();
-(function init(){renderItems();updateLiveTotal();scannerStatus.textContent='🔴 stopped';})();
-window.addEventListener('beforeunload',()=>{try{stopScanner();}catch(e){}});
+    document.getElementById('new-order').addEventListener('click', () => {
+      if(currentOrder.length === 0) {
+        alert('No items in current order!');
+        return;
+      }
+      const total = currentOrder.reduce((sum, item) => sum + parseFloat(item.price), 0);
+      alert(`Order Total: ₹${total.toFixed(2)}`);
+      allOrders.push([...currentOrder]);
+      currentOrder = [];
+      updateTable();
+      saveData();
+    });
 
-manualCode.addEventListener('keydown',e=>e.key==='Enter'&&addManualBtn.click());
-manualPrice.addEventListener('keydown',e=>e.key==='Enter'&&addManualBtn.click());
+    document.getElementById('export-csv').addEventListener('click', () => {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Barcode,Price,Timestamp,OrderIndex\n";
+      allOrders.forEach((order, index) => {
+        order.forEach(item => {
+          csvContent += `${item.barcode},${item.price},${item.timestamp},${index+1}\n`;
+        });
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "orders.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
 
-/* Tap to Focus */
-interactive.addEventListener('click',async e=>{
-  if(!activeTrack)return;
-  const capabilities=activeTrack.getCapabilities?.();
-  if(!capabilities||!capabilities.focusMode||!capabilities.focusPointX)return;
-  const rect=interactive.getBoundingClientRect();
-  const focusX=(e.clientX-rect.left)/rect.width;
-  const focusY=(e.clientY-rect.top)/rect.height;
-  try{await activeTrack.applyConstraints({advanced:[{focusMode:'single-shot',focusPointX:focusX,focusPointY:focusY}]});}catch(ex){console.log('tap focus failed',ex);}
-});
+    document.getElementById('zoom-slider').addEventListener('input', (e) => {
+      const track = Quagga.cameraAccess.getActiveTrack();
+      if(track && track.getCapabilities().zoom) {
+        track.applyConstraints({advanced: [{zoom: parseFloat(e.target.value)}]});
+      }
+    });
 
-/* Zoom Slider */
-zoomSlider.addEventListener('input',async e=>{
-  if(!activeTrack)return;
-  const capabilities=activeTrack.getCapabilities?.();
-  if(!capabilities||!capabilities.zoom)return;
-  const z=Number(e.target.value);
-  try{await activeTrack.applyConstraints({advanced:[{zoom:z}]});}catch(ex){console.log('zoom failed',ex);}
-});
-</script>
+    // Load previous data
+    currentOrder = JSON.parse(localStorage.getItem('currentOrder') || '[]');
+    updateTable();
+  </script>
 </body>
 </html>
